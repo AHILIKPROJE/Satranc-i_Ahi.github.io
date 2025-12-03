@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Oyun — Güncel Versiyon</title>
+<style>
+:root{
+  --gold:#b68a1f;
+  --paper:#e9dcc0;
+  --ink:#2f2313;
+  --dark:#0b0b0b;
+}
+body{margin:0;overflow:hidden;font-family:"Georgia",serif;background:#000}
+#game-area{
+  position:relative;width:100vw;height:100vh;
+  background:url("menu.png") no-repeat center center;
+  background-size:cover;
+}
+
+/* Hitboxlar */
+[class$="_hitbox"], .solalt_hitbox, .menusoru_hitbox, .menusesac_hitbox, .menuseskapa_hitbox, .ayarlar_solust_hitbox{
+  position:absolute;cursor:pointer;
+}
+[class$="_hitbox"]:not([class*="unlem_hitbox_"]){background:transparent;border:none;}
+.solalt_hitbox,.menusoru_hitbox,.menusesac_hitbox,.menuseskapa_hitbox{width:70px;height:70px}
+.solalt_hitbox{left:45px;bottom:40px}
+.menusoru_hitbox{left:140px;bottom:40px}
+.menusesac_hitbox{right:65px;bottom:35px}
+.menuseskapa_hitbox{right:155px;bottom:35px}
+.ayarlar_solust_hitbox{width:125px;height:125px;left:245px;top:60px}
+
+/* Overlay geçişleri */
+#overlay{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  background:#000;opacity:0;pointer-events:none;
+  transition:opacity .8s ease;z-index:5;
+}
+
+/* Görsellerin içindeki unlem/hayır ikonları */
+.unlem-img,.hayir-img{position:absolute;width:100%;height:100%;}
+
+/* Kayıt popup stili */
+#save-popup {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  display:none;justify-content:center;align-items:center;
+  background:rgba(0,0,0,0.85);z-index:9999;
+}
+#save-popup .popup-box {
+  background: linear-gradient(145deg,#3d2a1a,#b68c1f);
+  border:3px solid #a67c2e;
+  border-radius:20px;
+  padding:30px 50px;
+  text-align:center;
+  color:#fff;
+  font-size:20px;
+  font-weight:bold;
+  box-shadow:0 0 25px #000;
+}
+#save-popup .popup-box button {
+  margin:10px;
+  padding:10px 20px;
+  font-size:18px;
+  background:#a67c2e;
+  border:2px solid #704f1d;
+  border-radius:12px;
+  cursor:pointer;
+  color:#fff;
+  font-weight:bold;
+  transition:0.2s;
+}
+#save-popup .popup-box button:hover {
+  background:#f0c75e;
+  color:#000;
+}
+
+/* Ahilik Pop-up */
+#ahilik-popup {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  display:none;justify-content:center;align-items:center;
+  background:rgba(0,0,0,0.85);z-index:9999;
+}
+#ahilik-popup .popup-box {
+  background: linear-gradient(145deg,#3d2a1a,#b68a1f);
+  border:3px solid #a67c2e;
+  border-radius:20px;
+  padding:30px 50px;
+  text-align:left;
+  color:#fff;
+  font-size:18px;
+  box-shadow:0 0 25px #000;
+  max-width:800px;
+  max-height:80%;
+  overflow-y:auto;
+  position:relative;
+}
+#ahilik-popup .popup-box button {
+  margin-top:15px;
+  padding:8px 15px;
+  font-size:16px;
+  background:#a67c2e;
+  border:2px solid #704f1d;
+  border-radius:12px;
+  cursor:pointer;
+  color:#fff;
+  font-weight:bold;
+  transition:0.2s;
+}
+#ahilik-popup .popup-box button:hover {
+  background:#f0c75e;
+  color:#000;
+}
+#ahilik-popup .popup-box .close-btn {
+  position:absolute;
+  top:10px;
+  right:15px;
+}
+
+/* Nasıl Oynanır Pop-up (menusoru) */
+#nasil-popup {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  display:none;justify-content:center;align-items:center;
+  background:rgba(0,0,0,0.85);z-index:9999;
+}
+#nasil-popup .popup-box {
+  background: linear-gradient(145deg,#3d2a1a,#b68a1f);
+  border:3px solid #a67c2e;
+  border-radius:20px;
+  padding:30px 50px;
+  text-align:left;
+  color:#fff;
+  font-size:18px;
+  box-shadow:0 0 25px #000;
+  max-width:800px;
+  max-height:80%;
+  overflow-y:auto;
+  position:relative;
+}
+#nasil-popup .popup-box button {
+  margin-top:15px;
+  padding:8px 15px;
+  font-size:16px;
+  background:#a67c2e;
+  border:2px solid #704f1d;
+  border-radius:12px;
+  cursor:pointer;
+  color:#fff;
+  font-weight:bold;
+  transition:0.2s;
+}
+#nasil-popup .popup-box button:hover {
+  background:#f0c75e;
+  color:#000;
+}
+#nasil-popup .popup-box .close-btn {
+  position:absolute;
+  top:10px;
+  right:15px;
+}
+
+/* F11 popup (inline minimal style fallback removed from CSS) */
+</style>
+</head>
+<body>
+
+<!-- F11 Uyarısı Pop-up -->
+<div id="f11-popup" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:9999;">
+  <div style="background:linear-gradient(145deg,#3d2a1a,#b68c1f);border:3px solid #a67c2e;border-radius:20px;padding:40px 60px;text-align:center;color:#fff;font-size:24px;font-weight:bold;box-shadow:0 0 25px #000;">
+    Lütfen oyun tuşlarının doğru çalışması için <b>F11</b> tuşuna basarak devam ediniz.
+    <br>
+    <button id="f11-ok-btn" style="margin-top:20px;padding:12px 25px;font-size:20px;background:#a67c2e;border:2px solid #704f1d;border-radius:12px;cursor:pointer;color:#fff;font-weight:bold;transition:0.2s;">Tamam</button>
+  </div>
+</div>
+
+<!-- Kayıt Pop-up (Tek Kopya) -->
+<div id="save-popup">
+  <div class="popup-box">
+    <div id="save-title">Kayıt İşlemi</div>
+    <button id="save-game-btn">Kaydet</button>
+    <button id="load-game-btn">Yükle</button>
+    <button id="delete-game-btn">Sil</button>
+    <button id="close-save-btn">Kapat</button>
+  </div>
+</div>
+  
+<!-- Ahilik Pop-up -->
+<div id="ahilik-popup">
+  <div class="popup-box">
+    <button class="close-btn">X</button>
+    <div id="ahilik-content"></div>
+    <button id="prev-page">Önceki</button>
+    <button id="next-page">Sonraki</button>
+  </div>
+</div>
+
+<!-- Nasıl Oynanır Pop-up -->
+<div id="nasil-popup">
+  <div class="popup-box">
+    <button class="close-btn">X</button>
+    <h2 style="text-align:center;margin-bottom:15px;">Nasıl oynanır?</h2>
+    <div id="nasil-content" style="line-height:1.5;text-align:left;">
+      <p>Satranc-ı Ahi, aklın ve kalbin dengesini arayanların oyunudur.</p>
+      <p>Her oyuncu kendi nefsini temsil eden taşıyla, alt sıralardan başlayarak en üstteki “Visal” karesine ulaşmaya çalışır.</p>
+      <p>Bu yolculuk, sadece bir yarış değil; sabır, strateji ve içsel olgunlaşmanın simgesidir.</p>
+      <p>Taşlar her karede farklı bir mertebeyi temsil eder.</p>
+      <p>Her adım, oyuncunun bilgeliğini, sezgisini ve dikkatini sınar.</p>
+      <p>İleriye gitmek kadar, bazen geri çekilmek de ustalıktır.</p>
+      <p>Oyunun amacı rakibi yenmek değil, kendi yolculuğunu tamamlamaktır.</p>
+      <p>Gerçek zafer, visale ulaşırken gösterilen anlayış ve dengededir.</p>
+      <p>Zihin açıklığı, sabır ve strateji... İşte bu oyunun üç temel anahtarıdır.</p>
+    </div>
+  </div>
+</div>
+
+<div id="game-area"><div id="overlay"></div></div>
+
+<!-- Sesler -->
+<audio id="button-sp" src="button.mp3" preload="auto"></audio>
+<audio id="sayfa-sp" src="sayfases.mp3" preload="auto"></audio>
+<audio id="muzik" src="anamuzik.mp4" preload="auto" loop></audio>
+
+<script>
+// F11 pop-up
+document.getElementById('f11-ok-btn').addEventListener('click',()=>{
+  document.getElementById('f11-popup').style.display='none';
+});
+
+// Temel değişkenler
+const gameArea = document.getElementById('game-area');
+const overlay = document.getElementById('overlay');
+const buttonAudio = document.getElementById('button-sp');
+const sayfaAudio = document.getElementById('sayfa-sp');
+const muzik = document.getElementById('muzik');
+sayfaAudio.volume = 0.38;
+buttonAudio.volume = 0.5;
+muzik.volume = 0.45;
+
+let aktifArkaPlan = "menu.png";
+let oncekiSahne = null;
+let gunlukGorevSayfasi = null;
+
+// ----------------- Geçici popup fonksiyonu -----------------
+function showTemporaryPopup(message, duration = 3500) {
+    const popup = document.createElement('div');
+    popup.innerHTML = message;
+
+    Object.assign(popup.style, {
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%) scale(0.85)',
+        background: 'linear-gradient(180deg, #7a0c0c, #4d0505)',  // Osmanlı kırmızısı
+        color: '#f6e7b5',                                        // altınmsı yazı
+        padding: '35px 80px',
+        borderRadius: '18px',
+        border: '5px solid #c9a34e',                             // altın çerçeve
+        boxShadow: '0 0 30px rgba(0,0,0,0.7), inset 0 0 15px rgba(255,215,0,0.18)',
+        fontSize: '32px',
+        fontWeight: '700',
+        fontFamily: "'Georgia', 'Times New Roman', serif",        // hat sanatına yakın serif
+        letterSpacing: '1.5px',
+        textShadow: '0 0 6px rgba(0,0,0,0.6)',
+        zIndex: '10000',
+        opacity: '0',
+        transition: 'opacity 0.4s ease, transform 0.4s ease'
+    });
+
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+        popup.style.opacity = "1";
+        popup.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 50);
+
+    setTimeout(() => {
+        popup.style.opacity = "0";
+        popup.style.transform = "translate(-50%, -50%) scale(0.85)";
+    }, duration - 500);
+
+    setTimeout(() => popup.remove(), duration);
+}
+
+// ----------------- Ahilik Pop-up İçeriği -----------------
+const ahilikPages = [
+  `<h3>AHİLİK NEDİR</h3>
+   <p>Ahilik, XIII. yüzyılda Anadolu’da ortaya çıkan, dürüstlük, yardımlaşma ve adalet temeline dayanan bir esnaf teşkilatıdır. Usta, kalfa ve çırak sistemiyle hem mesleki hem ahlaki eğitim verilmiştir. Osmanlı’da lonca düzeniyle devam eden ahilik, günümüz iş ahlakı ve sosyal sorumluluk anlayışının temelini oluşturur.</p>
+   <h3>AHİLİĞE NASIL YÜKSELİNİR</h3>
+   <p>Ahiliğe tırmanmak, bir kişinin çıraklıktan ustalığa ilerleyerek hem mesleki hem de ahlaki yönden olgunlaşma sürecidir. Bu süreçte birey, dürüstlük, adalet ve yardımlaşma gibi değerleri benimseyerek topluma faydalı, erdemli bir insan olmayı hedefler.</p>`,
+  `<h3>YAMAKLIK TANIMI</h3>
+   <p>Yamak, Ahilikte mesleğe girişin ilk basamağındaki kişidir. Henüz çırak olmayan yamak, ustasını gözlemleyerek mesleğin kurallarını ve ahlaki değerleri öğrenir. Bu dönem, kişinin hem mesleğe hem topluma uyum sağladığı, sabır, saygı ve dürüstlük gibi erdemleri kazandığı bir hazırlık sürecidir.</p>
+   <h3>ÇIRAKLIK TANIMI</h3>
+   <p>Çıraklık, Ahilikte yamaklıktan sonra gelen ve mesleğin uygulamalı olarak öğrenildiği aşamadır. Çırak, ustasının yanında çalışarak hem el becerisi hem de ahlaki değerler kazanır. Bu dönem, bireyin sorumluluk bilinci, dürüstlük ve disiplin geliştirerek kalfalığa hazırlanmasını sağlar.</p>`,
+  `<h3>KALFALIK TANIMI</h3>
+   <p>Kalfalık, Ahilikte çıraklıktan sonra gelen ve ustalığa geçişi hazırlayan aşamadır. Kalfa, mesleğinde deneyim kazanmış, ustasına yardımcı olan ve çıraklara rehberlik eden kişidir. Bu dönemde birey, teknik becerilerini geliştirirken dürüstlük, sorumluluk ve ahlaki olgunluk gibi değerleri pekiştirir.</p>
+   <h3>USTALIK TANIMI</h3>
+   <p>Ustalık, Ahilikte mesleki eğitimin en yüksek aşamasıdır. Usta, çıraklık ve kalfalık dönemlerini tamamlamış, hem mesleğinde yetkin hem de ahlaken olgun kişidir. Bilgi ve deneyimini yeni nesillere aktarır, dürüstlük ve adaletle topluma örnek olur. Ustalık, hem mesleki mükemmelliğin hem de erdemin simgesidir.</p>`,
+  `<h3>AHİ ŞEFİ TANIMI</h3>
+   <p>Ahî Şefi, Ahilik teşkilatının en yüksek mertebesinde yer alan, mesleki ve ahlaki bakımdan en yetkin kişidir. Teşkilatın düzenini korur, adaleti sağlar, eğitim ve denetim görevlerini yürütür. Dürüstlük, cömertlik ve adalet gibi erdemleriyle topluma örnek olan Ahî Şefi, Ahiliğin manevi ve idari lideridir.</p>`
+  ];
+
+let currentAhilikPage = 0;
+
+function openAhilikPopup(){
+  currentAhilikPage = 0;
+  document.getElementById('ahilik-content').innerHTML = ahilikPages[currentAhilikPage];
+  document.getElementById('ahilik-popup').style.display='flex';
+}
+
+function updateAhilikContent(){
+  document.getElementById('ahilik-content').innerHTML = ahilikPages[currentAhilikPage];
+}
+
+document.querySelector('#ahilik-popup .close-btn').addEventListener('click',()=>{
+  document.getElementById('ahilik-popup').style.display='none';
+});
+
+document.getElementById('next-page').addEventListener('click',()=>{
+  if(currentAhilikPage<ahilikPages.length-1){ currentAhilikPage++; updateAhilikContent(); }
+});
+
+document.getElementById('prev-page').addEventListener('click',()=>{
+  if(currentAhilikPage>0){ currentAhilikPage--; updateAhilikContent(); }
+});
+
+// ----------------- Nasıl Oynanır Pop-up kapatma -----------------
+document.querySelector('#nasil-popup .close-btn').addEventListener('click',()=>{
+  document.getElementById('nasil-popup').style.display='none';
+});
+
+// ----------------- Sahneler ve hitboxlar -----------------
+const sahneler = {
+  "menu.png":[
+    {isim:"menuoyna",x:700,y:328,width:470,height:162},
+    {isim:"menuayarlar",x:700,y:850,width:470,height:160},
+    {isim:"dukkan_hitbox",x:696,y:573,width:504,height:187}
+  ],
+  "giris.png":[
+    {isim:"giris_test",x:47,y:48,width:130,height:122},
+    {isim:"mertebe",x:594,y:216,width:740,height:181},
+    {isim:"arsiv_kapi",x:601,y:497,width:730,height:171},
+    {isim:"basarilar",x:605,y:767,width:707,height:174},
+  ],
+  "arsiv.png":[
+    {isim:"arsiv_geri",x:54,y:29,width:103,height:98},
+    {isim:"arsiv_kayit1",x:581,y:246,width:767,height:181},
+    {isim:"arsiv_kayit2",x:576,y:466,width:772,height:180},
+    {isim:"arsiv_kayit3",x:573,y:687,width:777,height:183}
+  ],
+  "ayarlar.png":[
+    {isim:"ayarlar_solust",x:245,y:60,width:125,height:125},
+    {isim:"sesayarlari",x:394,y:248,width:432,height:169},
+    {isim:"goruntuayarlari",x:1019,y:248,width:432,height:169},
+    {isim:"yardim",x:1019,y:623,width:432,height:169},
+    {isim:"lisans",x:394,y:623,width:432,height:169}
+  ],
+  "bılgı1.png":[
+    {isim:"bılgı1_geri", x:279, y:86, width:374, height:174},
+    {isim:"bılgı1_ileri", x:1539, y:897, width:83, height:85}
+  ],
+  "bılgı2.png":[
+    {isim:"bılgı2_ileri", x:1539, y:897, width:83, height:85}
+  ],
+  "bılgı3.png":[
+    {isim:"bılgı3_geri", x:50, y:50, width:120, height:80}
+  ]
+};
+
+// Görev sahneleri 5..11
+const gorevSayfalari = ['5.png','6.png','7.png','8.png','9.png','10.png','11.png'];
+gorevSayfalari.forEach((sayfa,i)=>{
+  sahneler[sayfa] = [
+    {isim:`gorev_geri_${i+5}`,x:23,y:22,width:213,height:221},
+    {isim:`unlem_hitbox_${i+5}`,x:776,y:187,width:139,height:149,unlemGorsel:true},
+    {isim:`extra1_${i+5}`,x:1746,y:434,width:51,height:46,hayirGorsel:true},
+    {isim:`extra2_${i+5}`,x:1749,y:674,width:51,height:46,hayirGorsel:true},
+    {isim:`extra3_${i+5}`,x:1742,y:954,width:51,height:46,hayirGorsel:true}
+  ];
+});
+
+// Sahneler arası geri geçiş hedefleri
+const backTargets = {
+  "giris_test":"menu.png",
+  "arsiv_geri":"giris.png",
+  "aciklama1_geri":"giris.png",
+  "aciklama2_geri":"aciklama1.png",
+  "geri2":"giris.png",
+  "bılgı1_geri":"menu.png"
+};
+gorevSayfalari.forEach((sayfa,i)=>backTargets[`gorev_geri_${i+5}`]='giris.png');
+
+// Fonksiyonlar
+function gunlukGorevSec() {
+    const now = new Date();
+    const turkiyeSaat = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+    const gun = turkiyeSaat.getUTCDate();
+    const index = gun % gorevSayfalari.length;
+    gunlukGorevSayfasi = gorevSayfalari[index];
+    return gunlukGorevSayfasi;
+}
+
+function sahneDegistir(yeni){
+  oncekiSahne = aktifArkaPlan;
+  aktifArkaPlan = yeni;
+  document.body.setAttribute("data-scene", yeni);
+  overlay.style.opacity="1";
+  setTimeout(()=>{
+    gameArea.style.backgroundImage = `url("${yeni}")`;
+    overlay.style.opacity="0";
+    hitboxlariYukle();
+  },800);
+}
+
+function playButton(){ try{ sayfaAudio.pause(); sayfaAudio.currentTime=0; }catch(e){} try{ buttonAudio.currentTime=0; buttonAudio.play(); }catch(e){} }
+function playSayfa(){ try{ buttonAudio.pause(); buttonAudio.currentTime=0; }catch(e){} try{ sayfaAudio.currentTime=0; sayfaAudio.play(); }catch(e){} }
+
+// ----------------- Hitboxları yükleme -----------------
+function hitboxlariYukle(){
+  document.querySelectorAll('[class$="_hitbox"], .solalt_hitbox, .menusoru_hitbox, .menusesac_hitbox, .menuseskapa_hitbox, .ayarlar_solust_hitbox').forEach(e=>e.remove());
+
+  const aktif = sahneler[aktifArkaPlan] || [];
+  aktif.forEach(h=>{
+    const div = document.createElement('div');
+    div.className = h.isim+"_hitbox";
+    Object.assign(div.style,{
+      left: h.x+"px",
+      top: h.y+"px",
+      width: h.width+"px",
+      height: h.height+"px",
+      background: "transparent",
+      position: "absolute",
+      cursor: "pointer",
+      zIndex: 10
+    });
+
+    if(h.unlemGorsel){
+      const img = document.createElement("img"); img.src="unlem.png"; img.className="unlem-img"; div.appendChild(img);
+    }
+    if(h.hayirGorsel){
+      const img = document.createElement("img"); img.src="hayir.png"; img.className="hayir-img"; div.appendChild(img);
+    }
+
+    div.addEventListener('click',()=>{
+      playButton();
+
+      // ------------------ Özel İşlevler ------------------
+      if(h.isim==='arsiv_kayit1' || h.isim==='arsiv_kayit2' || h.isim==='arsiv_kayit3'){
+        acSavePopup(h.isim);
+        return;
+      }
+
+      // Yeni eklenen: arsiv_kapi hitbox
+      if(h.isim==='arsiv_kapi'){
+        playButton();
+        showTemporaryPopup("Yakında gelecek...", 3500);
+        return;
+      }
+
+      if(h.isim==='bılgı1_geri'){ playSayfa(); return sahneDegistir('menu.png'); }
+      if(h.isim==='bılgı1_ileri'){ playSayfa(); return sahneDegistir('bılgı2.png'); }
+      if(h.isim==='bılgı2_ileri'){ playSayfa(); return sahneDegistir('bılgı3.png'); }
+
+      if(h.isim==='basarilar'){
+    playButton();
+    showTemporaryPopup("Yakında gelecek...", 3500);
+    return;
+}
+
+
+      if(h.isim==='dukkan_hitbox'){
+        window.location.href="dukkan.html";
+        return;
+      }
+
+      if(aktifArkaPlan==='soru.png'){
+        if(h.isim==='geri1'){ playSayfa(); if(gunlukGorevSayfasi) return sahneDegistir(gunlukGorevSayfasi);}
+        if(h.isim==='geri2'){ playSayfa(); return sahneDegistir(oncekiSahne || 'giris.png'); }
+        if(h.isim==='ileri'){ playSayfa(); return sahneDegistir('sualhane.png'); }
+      }
+
+      if(h.isim.startsWith('unlem_hitbox_')){ playSayfa(); return sahneDegistir('soru.png'); }
+      if(h.isim==='sualhane_geri'){ playSayfa(); return sahneDegistir(oncekiSahne || 'giris.png'); }
+      if(backTargets[h.isim]) return sahneDegistir(backTargets[h.isim]);
+
+      if(h.isim==='menuoyna') return sahneDegistir('giris.png');
+      if(h.isim==='menuayarlar') return sahneDegistir('ayarlar.png');
+      if(h.isim==='ayarlar_solust') return sahneDegistir('menu.png');
+      if(h.isim==='tahta_gorunumu') return sahneDegistir('dukkantahta.png');
+      if(h.isim==='tas_gorunumu') return sahneDegistir('tahtadukkan.png');
+      if(h.isim==='menu') return sahneDegistir('menu.png');
+      if(h.isim==='mertebe') return sahneDegistir('arsiv.png');
+      if(h.isim==='aciklama1geri') return sahneDegistir('giris.png');
+      if(h.isim==='aciklama1ileri') { playSayfa(); return sahneDegistir('aciklama2.png'); }
+      if(h.isim==='aciklama2geri') { playSayfa(); return sahneDegistir('aciklama1.png'); }
+
+      // ----------------- AYARLAR.PNG HİTBOX YÖNLENDİRMELERİ -----------------
+      if(aktifArkaPlan==='ayarlar.png'){
+        if(h.isim==='sesayarlari'){ window.location.href="sesayarları.html"; return; }
+        if(h.isim==='goruntuayarlari'){ window.location.href="goruntuayarları.html"; return; }
+        if(h.isim==='lisans'){ window.location.href="destek.html"; return; }
+      }
+    });
+
+    gameArea.appendChild(div);
+  });
+
+  // Menü alt ikonları + ses toggle
+  if(aktifArkaPlan==='menu.png'){
+    // SOLALT: Ahilik popup
+    const solaltDiv = document.createElement('div');
+    solaltDiv.className = 'solalt_hitbox';
+    Object.assign(solaltDiv.style,{position:'absolute',left:'45px',bottom:'40px',width:'70px',height:'70px',cursor:'pointer',zIndex:11});
+    solaltDiv.addEventListener('click',()=>{
+      playButton();
+      openAhilikPopup();
+    });
+    gameArea.appendChild(solaltDiv);
+
+    // MENUSORU: Nasıl oynanır popup
+    const menusoruDiv = document.createElement('div');
+    menusoruDiv.className = 'menusoru_hitbox';
+    Object.assign(menusoruDiv.style,{position:'absolute',left:'140px',bottom:'40px',width:'70px',height:'70px',cursor:'pointer',zIndex:11});
+    menusoruDiv.addEventListener('click',()=>{
+      playButton();
+      document.getElementById('nasil-popup').style.display='flex';
+    });
+    gameArea.appendChild(menusoruDiv);
+
+    // SES toggle hitbox
+    const sesDiv = document.createElement('div');
+    sesDiv.className = 'menusesac_hitbox';
+    Object.assign(sesDiv.style,{position:'absolute',right:'65px',bottom:'35px',width:'70px',height:'70px',cursor:'pointer',zIndex:11});
+    const sesImg = document.createElement('img');
+    sesImg.src="https://i.imgur.com/h3Er0z7.png";
+    sesImg.style.width="100%"; sesImg.style.height="100%";
+    sesDiv.appendChild(sesImg);
+    sesDiv.addEventListener('click',()=>{
+      playButton();
+      if(muzik.paused){ muzik.play(); }
+      else { muzik.pause(); }
+    });
+    gameArea.appendChild(sesDiv);
+  }
+
+  // Ayarlar sol üst hitbox
+  if(aktifArkaPlan==='ayarlar.png'){
+    const div = document.createElement('div'); div.className='ayarlar_solust_hitbox';
+    div.addEventListener('click',()=>{ playSayfa(); sahneDegistir('menu.png'); });
+    gameArea.appendChild(div);
+  }
+}
+
+// ----------------- Kayıt Popup Fonksiyonları -----------------
+const savePopupElem = document.getElementById('save-popup');
+const saveTitleElem = document.getElementById('save-title');
+const saveBtn = document.getElementById('save-game-btn');
+const loadBtn = document.getElementById('load-game-btn');
+const deleteBtn = document.getElementById('delete-game-btn');
+const closeBtn = document.getElementById('close-save-btn');
+
+let currentSaveSlot = null;
+
+function acSavePopup(slot){
+  currentSaveSlot = slot;
+  saveTitleElem.textContent = slot+" için kayıt işlemleri";
+  savePopupElem.style.display = "flex";
+}
+
+saveBtn.addEventListener('click',()=>{
+  if(currentSaveSlot){
+    const now = new Date();
+    const tarihSaat = now.toLocaleString();
+    localStorage.setItem(currentSaveSlot, JSON.stringify({scene:aktifArkaPlan, tarih:tarihSaat}));
+    alert(currentSaveSlot+" kaydedildi! ("+tarihSaat+")");
+  }
+});
+
+// ----------------- YENİ: Yükle butonu video oynatma ve oyun.html açma -----------------
+loadBtn.addEventListener('click', ()=>{
+  if(currentSaveSlot){
+    const video = document.createElement('video');
+    video.src = "babacocuk.mp4";
+    video.style.position = "fixed";
+    video.style.top = "50%";
+    video.style.left = "50%";
+    video.style.transform = "translate(-50%, -50%)";
+    video.style.width = "100%";
+    video.style.height = "100%";
+    video.style.zIndex = 99999;
+    video.autoplay = true;
+    video.controls = false;
+    video.style.backgroundColor = "#000"; // arka plan karartma
+    document.body.appendChild(video);
+    savePopupElem.style.display = "none"; // popup kapat
+
+    // Yumuşak fade-in
+    video.style.opacity = 0;
+    video.style.transition = "opacity 1s";
+    setTimeout(()=>{ video.style.opacity = 1; }, 50);
+
+    video.addEventListener('ended', ()=>{
+      // Fade-out
+      video.style.opacity = 0;
+      setTimeout(()=>{
+        document.body.removeChild(video);
+        window.location.href = "oyun.html";
+      },1000);
+    });
+  }
+});
+
+deleteBtn.addEventListener('click',()=>{
+  if(currentSaveSlot){
+    localStorage.removeItem(currentSaveSlot);
+    alert(currentSaveSlot+" silindi!");
+  }
+});
+
+closeBtn.addEventListener('click',()=>{ savePopupElem.style.display="none"; });
+
+// İlk yükleme
+hitboxlariYukle();
+</script>
+</body>
+</html>
+

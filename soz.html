@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Ahi Sözü Tamamlama</title>
+<style>
+body {
+  margin:0;
+  font-family:sans-serif;
+  background:url('https://i.imgur.com/io8q24n.jpeg') no-repeat center center fixed;
+  background-size:cover;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+#game {
+  width:650px;
+  background:rgba(255,248,232,0.95);
+  border:4px solid #b07f3e;
+  border-radius:12px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 6px 15px rgba(0,0,0,0.3);
+  position: relative;
+}
+#infoBox {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(240, 230, 200, 0.95);
+  color: #5c3a1a;
+  padding: 10px 20px;
+  border: 2px solid #b07f3e;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+h1 { color:#5c3a1a; }
+
+button {
+  margin:10px;
+  padding:10px 20px;
+  border:none;
+  border-radius:8px;
+  background:#d9a066;
+  color:#fff;
+  cursor:pointer;
+  font-size:16px;
+  transition:0.2s;
+}
+button:hover { background:#c18448; }
+
+#feedback { margin-top:15px; font-weight:bold; color:#333; }
+#explanation { margin-top:10px; font-style:italic; color:#5c3a1a; }
+#progress-container { width:100%; height:20px; background:#ddd; border-radius:10px; margin-top:15px; }
+#progress-bar { width:0%; height:100%; background:#5c3a1a; border-radius:10px; transition:0.3s; }
+#score { margin-top:10px; font-weight:bold; color:#333; }
+
+/* Geri Dön Butonu */
+#backBtn {
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:#b07f3e;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:6px;
+  font-size:14px;
+}
+#backBtn:hover { background:#8f6232; }
+</style>
+</head>
+  <body>
+<div id="infoBox">
+  Bu oyundaki sözler ahilik geleneğinden gelen kalıp cümlelerdir.<br>
+  Soruları lütfen kafanıza göre cevaplamayınız.
+  <button id="closeInfo">✖</button>
+</div>
+
+<div id="game">
+  <button id="backBtn" onclick="history.back()">⬅ Geri Dön</button>
+  <h1>Ahi Sözü Tamamlama</h1>
+  <p id="quote"></p>
+  <div id="options"></div>
+  <div id="feedback"></div>
+  <div id="explanation"></div>
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+  <div id="score">Puan: 0</div>
+</div>
+
+<script>
+// Havuzumuz artık Ahilik sözleri ve verdiğin eklerle birlikte
+const gameData = [
+  {quote:"Akıl ve … ile çalış ki kimseye muhtaç olmayasın.", options:["zihin","emek","düşünce"], answer:"emek", source:"Ahi Evran"},
+  {quote:"Komşusu açken … uyumayan kişi Ahi değildir.", options:["el","kulak","göz"], answer:"göz", source:"Ahilik geleneği"},
+  {quote:"İşini … yap ki bereketi artar.", options:["yalanla","dikkatle","önemle"], answer:"dikkatle", source:"Ahi Evran"},
+  {quote:"Ahi insanı … ve adaletle davranır.", options:["iyilik","sabır","yardımcı"], answer:"sabır", source:"Ahilik geleneği"},
+  {quote:"El emek verip işini … yapan kazançlıdır.", options:["dürüstçe","imece","başkasına vererek"], answer:"dürüstçe", source:"Ahi Evran"},
+  {quote:"Ahi … ve yardımseverdir.", options:["cömert","adil","kıskanç"], answer:"cömert", source:"Ahilik geleneği"},
+  {quote:"Ahilikte önce … sonra kazanç gelir.", options:["ahlak","para","gelişme"], answer:"ahlak", source:"Ahi Evran"},
+  {quote:"Kendi işine … gösteren Ahi başarılı olur.", options:["bencillik","ihmal","özen"], answer:"özen", source:"Ahilik geleneği"},
+  {quote:"Ahi işinde … ile hareket eder.", options:["yavaşlık","dürüstlük","acelecilik"], answer:"dürüstlük", source:"Ahi Evran"},
+  {quote:"Eline, …, beline sahip ol. Kalbini, kapını, alnını açık tut.", options:["gözüne","diline","sözüne"], answer:"diline", source:"Ahi Evran"},
+  {quote:"Ahi’nin eli, kapısı, sofrası açık olmalı; … ve dili kapalı olmalı.", options:["gözü","beli","kulağı"], answer:"beli", source:"Ahi Evran"},
+  {quote:"Eşine, işine, … özen göster.", options:["aşına","tuttuğuna","arkadaşına"], answer:"aşına", source:"Ahilik geleneği"},
+  {quote:"İyi Ahi, işinde … ve sabırlıdır.", options:["titiz","dikkatsiz","telaşlı"], answer:"titiz", source:"Ahi Evran"},
+  {quote:"Ahilikte …, her şeyin başıdır.", options:["ahlak","kurnazlık","şans"], answer:"ahlak", source:"Ahi Evran"},
+  {quote:"Mesleğini öğrenirken … önemlidir.", options:["öğrenme","acele","umursamazlık"], answer:"öğrenme", source:"Ahilik geleneği"},
+  {quote:"Ahi, müşterisine … ve adil davranır.", options:["saygı","öfke","umursamazlık"], answer:"saygı", source:"Ahilik geleneği"},
+  {quote:"Her işin başı … ve çalışmaktır.", options:["emek","hile","tutku"], answer:"emek", source:"Ahi Evran"},
+  {quote:"Ahi, sözünde durur ve … yapmaz.", options:["yalan","yardım","dikkat"], answer:"yalan", source:"Ahi Evran"},
+  {quote:"Esnaf, işinde … ve sabırlı olmalıdır.", options:["özveri","acele","korkaklık"], answer:"özveri", source:"Ahilik geleneği"},
+  {quote:"Ahilik, toplumda … ve huzur getirir.", options:["dostluk","kıskançlık","öfke"], answer:"dostluk", source:"Ahilik geleneği"},
+  {quote:"Ahilikte kazanç, … ve dürüstlükle sağlanır.", options:["emek","hile","şans"], answer:"emek", source:"Ahi Evran"},
+  {quote:"İyi Ahi, … ve paylaşımcıdır.", options:["cömert","bencil","kibirli"], answer:"cömert", source:"Ahilik geleneği"},
+  // Eklediğin özel sözler:
+  {quote:"Eline, …, beline sahip ol. Kalbini, kapını, alnını açık tut.", options:["diline","gözüne","sözüne"], answer:"diline", source:"Ahi Evran"},
+  {quote:"Ahi’nin eli, kapısı, sofrası açık olmalı; … ve dili kapalı olmalı.", options:["gözü","beli","kulağı"], answer:"beli", source:"Ahi Evran"},
+  {quote:"Eşine, işine, … özen göster.", options:["aşına","tuttuğuna","arkadaşına"], answer:"aşına", source:"Ahilik geleneği"}
+];
+
+// Rastgele 5 soru seçiyoruz
+const selectedQuestions = gameData.sort(()=>Math.random()-0.5).slice(0,5);
+
+let current = 0;
+let score = 0;
+
+// Günlük limit kontrolü
+const today = new Date().toISOString().slice(0,10);
+let dailyData = JSON.parse(localStorage.getItem('dailyGame')) || {date:"", count:0};
+
+if(dailyData.date !== today){
+  dailyData = {date: today, count:0};
+  localStorage.setItem('dailyGame', JSON.stringify(dailyData));
+}
+
+if(dailyData.count >= 5){
+  document.getElementById("game").innerHTML = `
+    <h1>Günlük limit doldu ⛔</h1>
+    <p>Bugün en fazla 5 soru çözebilirsiniz. Yarın tekrar deneyin.</p>
+    <button id="backBtn" onclick="history.back()">⬅ Geri Dön</button>
+  `;
+}
+
+  else {
+  dailyData.count++;
+  localStorage.setItem('dailyGame', JSON.stringify(dailyData));
+  loadQuestion();
+}
+
+function loadQuestion(){
+  const q = selectedQuestions[current];
+  document.getElementById("quote").textContent = q.quote;
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+  q.options.forEach(opt=>{
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = ()=>checkAnswer(btn);
+    optionsDiv.appendChild(btn);
+  });
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("explanation").textContent = `Kaynak: ${q.source}`;
+  updateProgress();
+}
+
+function checkAnswer(btn){
+  const q = selectedQuestions[current];
+  if(btn.textContent === q.answer){
+    document.getElementById("feedback").textContent="✅ Doğru!";
+    score += 20; // Her soru 20 puan
+    current++;
+    updateScore();
+    if(current < selectedQuestions.length){
+      setTimeout(loadQuestion, 1000);
+    } else {
+      setTimeout(()=> {
+        document.getElementById("game").innerHTML = `
+          <h1>Tebrikler! 🎉</h1>
+          <h2>Puan: ${score}</h2>
+          <button id="backBtn" onclick="history.back()">⬅ Geri Dön</button>
+        `;
+      }, 500);
+    }
+  } else {
+    document.getElementById("feedback").textContent="❌ Yanlış, tekrar dene.";
+  }
+}
+
+function updateProgress(){
+  const percent = (current/selectedQuestions.length)*100;
+  document.getElementById("progress-bar").style.width = percent+"%";
+}
+
+function updateScore(){
+  document.getElementById("score").textContent = "Puan: "+score;
+}
+document.getElementById("closeInfo").onclick = function() {
+  document.getElementById("infoBox").style.display = "none";
+};
+                 
+</script>
+
+</body>
+</html>

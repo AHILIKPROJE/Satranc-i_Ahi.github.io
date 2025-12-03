@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Erdemli Meslekler Galaksisi (V16)</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #0d1a26; }
+        canvas { display: block; }
+        #info {
+            position: absolute; top: 10px; left: 10px;
+            color: white; 
+            background: rgba(40, 40, 40, 0.8); 
+            padding: 10px 15px; 
+            font-family: 'Arial', sans-serif;
+            border-radius: 8px;
+            line-height: 1.5;
+            z-index: 100;
+        }
+        #info h3 { margin-top: 0; color: #00BFFF; border-bottom: 1px solid #00BFFF; padding-bottom: 5px; }
+        #info p { margin: 5px 0; }
+        #score { color: #FFD700; font-weight: bold; }
+        
+        /* Yeni Kontrol Paneli Stili */
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        .control-button {
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .control-button:hover {
+            background-color: #0056b3;
+        }
+        #pause-button {
+            background-color: #ffc107;
+            color: #333;
+        }
+        #pause-button:hover {
+            background-color: #e0a800;
+        }
+        #menu-button {
+            background-color: #dc3545;
+        }
+        #menu-button:hover {
+            background-color: #c82333;
+        }
+
+        #level-alert {
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            color: #FFD700; 
+            font-size: 48px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px 40px;
+            border-radius: 10px;
+            border: 3px solid #FFD700;
+            display: none; 
+            z-index: 500;
+            text-align: center;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://threejs.org/examples/js/geometries/TextGeometry.js"></script>
+</head>
+<body>
+    <div id="info">
+        <h3>🌌 Ahi Gözcüsü</h3>
+        <p>Görevin: **Kırmızı Halkalı** (Kötü Değer) hedefleri vurmak, diğerlerinden **kaçınmak**.</p>
+        <p>Puan: <span id="score">0</span></p>
+        <p>Zorluk Seviyesi: <span id="difficulty-level">1 (Çok Kolay)</span></p>
+        <p>Kontrol: **FARE TIKLAMASI** ile ateş et.</p>
+    </div>
+    
+    <div id="controls">
+        <button id="pause-button" class="control-button">OYUNU DURDUR</button>
+        <button id="restart-button" class="control-button">YENİDEN BAŞLAT</button>
+        <button id="menu-button" class="control-button">ANA MENÜ</button>
+    </div>
+
+    <div id="level-alert"></div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        // --- Oyun Durumu Değişkeni ---
+        let isPaused = false; 
+
+        // --- Türkçe Karakter Düzeltme Fonksiyonu ---
+        function cleanTurkish(text) {
+            text = text.toUpperCase();
+            text = text.replace(/İ/g, 'I');
+            text = text.replace(/Ü/g, 'U');
+            text = text.replace(/Ş/g, 'S');
+            text = text.replace(/Ç/g, 'C');
+            text = text.replace(/Ğ/g, 'G');
+            text = text.replace(/Ö/g, 'O');
+            return text;
+        }
+
+        // --- 1. Temel Kurulum ve UI Elementleri ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0d1a26); 
+        scene.fog = new THREE.Fog(0x1a2a3a, 100, 300); 
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: document.getElementById('gameCanvas') });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        camera.position.set(0, 0, 10); 
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 1.5);
+        pointLight.position.set(0, 0, 10);
+        scene.add(pointLight);
+
+        // UI Elementleri ve Kontroller
+        const scoreElement = document.getElementById('score');
+        const difficultyElement = document.getElementById('difficulty-level');
+        const alertElement = document.getElementById('level-alert');
+        const pauseButton = document.getElementById('pause-button');
+        const restartButton = document.getElementById('restart-button');
+        const menuButton = document.getElementById('menu-button');
+        
+        // --- Buton Event Listener'ları ---
+        pauseButton.addEventListener('click', togglePause);
+        restartButton.addEventListener('click', () => {
+            window.location.reload(); // Sayfayı yeniden yükleyerek oyunu sıfırla
+        });
+        menuButton.addEventListener('click', () => {
+            window.location.href = 'oyun.html'; // Ana menü dosyasına yönlendir
+        });
+
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseButton.textContent = 'OYUNU BAŞLAT';
+                alertElement.innerHTML = 'DURAKLATILDI';
+                alertElement.style.display = 'block';
+            } else {
+                pauseButton.textContent = 'OYUNU DURDUR';
+                alertElement.style.display = 'none';
+                animate(); // Animasyon döngüsünü durmuşsa tekrar başlat
+            }
+        }
+        
+        // --- 2. Görsel Bileşenler ---
+        
+        // Gezegen Dokusu Oluşturma Fonksiyonu (V15'ten)
+        function createAdvancedPlanetTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 128; 
+
+            const ctx = canvas.getContext('2d');
+
+            const colorPalettes = [
+                { baseHue: 270, baseSaturation: 70, baseLightness: 50, cloudHueOffset: 30, cloudSaturation: 50, cloudLightness: 30 }, 
+                { baseHue: 40, baseSaturation: 70, baseLightness: 60, cloudHueOffset: 20, cloudSaturation: 40, cloudLightness: 20 }, 
+                { baseHue: 200, baseSaturation: 80, baseLightness: 40, cloudHueOffset: 40, cloudSaturation: 60, cloudLightness: 30 },
+                { baseHue: 120, baseSaturation: 60, baseLightness: 40, cloudHueOffset: 30, cloudSaturation: 50, cloudLightness: 20 },
+                { baseHue: 0, baseSaturation: 80, baseLightness: 40, cloudHueOffset: 20, cloudSaturation: 50, cloudLightness: 20 },
+                { baseHue: 330, baseSaturation: 90, baseLightness: 55, cloudHueOffset: 25, cloudSaturation: 60, cloudLightness: 35 }, 
+                { baseHue: 60, baseSaturation: 80, baseLightness: 65, cloudHueOffset: 15, cloudSaturation: 50, cloudLightness: 30 } 
+            ];
+            const selectedPalette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+
+            const baseColor = `hsl(${selectedPalette.baseHue + (Math.random() * 20 - 10)}, ${selectedPalette.baseSaturation + (Math.random() * 20 - 10)}%, ${selectedPalette.baseLightness + (Math.random() * 20 - 10)}%)`;
+            ctx.fillStyle = baseColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < 30; i++) { 
+                const hue = selectedPalette.baseHue + (Math.random() * selectedPalette.cloudHueOffset * 2 - selectedPalette.cloudHueOffset);
+                const saturation = selectedPalette.cloudSaturation + (Math.random() * 30 - 15);
+                const lightness = selectedPalette.cloudLightness + (Math.random() * 30 - 15);
+                const opacity = 0.6 + Math.random() * 0.4; 
+                ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${opacity})`;
+                
+                const startX = Math.random() * canvas.width;
+                const startY = Math.random() * canvas.height;
+                const width = 60 + Math.random() * 180; 
+                const height = 20 + Math.random() * 60; 
+                const rotation = Math.random() * Math.PI * 2;
+
+                ctx.save();
+                ctx.translate(startX, startY);
+                ctx.rotate(rotation);
+                ctx.fillRect(-width / 2, -height / 2, width, height);
+                ctx.restore();
+            }
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Gezegen Oluşturma Fonksiyonu
+        const planets = [];
+        function createPlanet(radius, x, y, z, hasRing = false) {
+            const group = new THREE.Group(); 
+            const geometry = new THREE.SphereGeometry(radius, 32, 32);
+            const texture = createAdvancedPlanetTexture(); 
+            
+            const material = new THREE.MeshPhongMaterial({ 
+                map: texture, 
+                shininess: 30, 
+                emissive: 0x888888, 
+                emissiveIntensity: 1.0 
+            });
+            const planet = new THREE.Mesh(geometry, material);
+            group.add(planet);
+
+            if (hasRing) {
+                const ringGeometry = new THREE.RingGeometry(radius * 1.2, radius * 1.5, 64);
+                const ringMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xFFD700, 
+                    side: THREE.DoubleSide, 
+                    transparent: true, 
+                    opacity: 0.9 
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = Math.PI / 2; 
+                ring.rotation.y = Math.random() * Math.PI; 
+                group.add(ring);
+            }
+
+            group.position.set(x, y, z);
+            scene.add(group);
+            planets.push(group); 
+            return group;
+        }
+
+        // Gezegenler
+        createPlanet(50, 150, 50, -300); 
+        createPlanet(30, -150, -80, -450); 
+        createPlanet(70, -20, 150, -600); 
+        createPlanet(40, 200, -100, -800);
+        createPlanet(60, -250, 80, -950);
+        createPlanet(45, 100, -180, -1100, true); 
+        createPlanet(55, -300, 120, -1300);
+
+        // Yıldızlar (Hiper Yoğun ve Dev Boyutlu - V15'ten)
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsMaterial = new THREE.PointsMaterial({ 
+            color: 0xffffff, 
+            size: 2.0, 
+            vertexColors: true 
+        }); 
+        const starVertices = [];
+        const starColors = [];
+        const starColorOptions = [
+            new THREE.Color(0xFFFFFF),
+            new THREE.Color(0xADD8E6),
+            new THREE.Color(0xFFFDD0),
+            new THREE.Color(0xFFE0B2),
+            new THREE.Color(0xB0E0E6)
+        ];
+
+        for (let i = 0; i < 70000; i++) { 
+            const x = (Math.random() - 0.5) * 5000;
+            const y = (Math.random() - 0.5) * 5000;
+            const z = -50 - (Math.random() * 950); 
+            starVertices.push(x, y, z);
+
+            const randomColor = starColorOptions[Math.floor(Math.random() * starColorOptions.length)];
+            starColors.push(randomColor.r, randomColor.g, randomColor.b);
+        }
+        starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+        starsGeometry.setAttribute('color', new THREE.Float32BufferAttribute(starColors, 3)); 
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+
+        // Kuyruklu Yıldızlar 
+        const comets = [];
+        let cometSpawnTimer = 0;
+        const cometSpawnInterval = 2.5; 
+        
+        function createComet() {
+            const cometHeadGeometry = new THREE.SphereGeometry(0.7, 8, 8); 
+            const cometHeadMaterial = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, emissive: 0xFFFFFF, emissiveIntensity: 5 }); 
+            const cometHead = new THREE.Mesh(cometHeadGeometry, cometHeadMaterial);
+
+            const tailGeometry = new THREE.BufferGeometry();
+            const tailMaterial = new THREE.PointsMaterial({
+                color: 0xADD8E6, 
+                size: 0.6, 
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending 
+            });
+            const tailVertices = [];
+            for (let i = 0; i < 80; i++) { 
+                tailVertices.push(0, 0, 0); 
+            }
+            tailGeometry.setAttribute('position', new THREE.Float32BufferAttribute(tailVertices, 3));
+            const cometTail = new THREE.Points(tailGeometry, tailMaterial);
+            cometHead.add(cometTail); 
+
+            const direction = new THREE.Vector3(
+                (Math.random() - 0.5) * 2, 
+                (Math.random() - 0.5) * 2, 
+                -1 - Math.random() * 1.5 
+            ).normalize();
+
+            const startX = (Math.random() - 0.5) * 300; 
+            const startY = (Math.random() - 0.5) * 250;
+            const startZ = -50 - Math.random() * 500; 
+
+            cometHead.position.set(startX, startY, startZ);
+            cometHead.userData = {
+                direction: direction,
+                speed: 2.5 + Math.random() * 3, 
+                lifetime: 0,
+                maxLifetime: 200 
+            };
+            
+            scene.add(cometHead);
+            comets.push(cometHead);
+        }
+
+
+        // --- 3. Oyun Değişkenleri ve Değerler ---
+        const targets = [];
+        const shots = []; 
+        let score = 0;
+        let lastLevel = 1;
+        let font;
+        
+        const goodValues = ['ADALET', 'VEFA', 'DOGRULUK', 'COMERTLIK', 'SAYGI', 'HIKMET', 'IFFET', 'HOSGORU', 'KANAT', 'MERHAMET', 'SEVECENLIK', 'SOZUNDE DURMA', 'ALCAK GONULLULUK'];
+        const badValues = ['HILE', 'HARAM', 'YALAN', 'CIMRILIK', 'KIBIR', 'NANKORLUK', 'HAINLIK', 'KORKAKLIK', 'HAKSIZLIK', 'ACGOZLULUK', 'ZALIMLIK', 'SOZDEN CAYMA', 'KAPI KAPAMA'];
+
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2(); 
+
+        // Three.js FontLoader
+        const fontLoader = new THREE.FontLoader();
+        fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (response) {
+            font = response;
+            for(let i = 0; i < 15; i++) {
+                createTarget();
+            }
+            animate(); // Font yüklendikten sonra animasyonu başlat
+        });
+        
+        // --- 4. Zorluk Seviyesi Ayarlama ve Uyarı Fonksiyonları ---
+        function getDifficulty(currentScore) {
+            const level = Math.floor(currentScore / 100) + 1;
+            let speedBase, maxTargets, oscillationFactor, spawnRate, levelName;
+
+            const speedMultiplier = (level - 1) * 0.08; 
+
+            if (level === 1) { 
+                levelName = "Çok Kolay";
+            } else if (level === 2) { 
+                levelName = "Kolay";
+            } else if (level === 3) { 
+                levelName = "Orta";
+            } else { 
+                levelName = "Zor";
+            }
+
+            const baseSpeed = 0.05;
+            const baseOscillation = 0.8;
+
+            speedBase = baseSpeed + speedMultiplier;
+            maxTargets = 15 + (level - 1) * 10;
+            oscillationFactor = baseOscillation + (level - 1) * 0.7;
+            spawnRate = 0.01 + (level - 1) * 0.008; 
+
+            return { level, speedBase, maxTargets, oscillationFactor, spawnRate, levelName };
+        }
+
+        function showAlert(message) {
+            alertElement.innerHTML = message;
+            alertElement.style.display = 'block';
+            setTimeout(() => {
+                if (!isPaused) {
+                    alertElement.style.display = 'none';
+                }
+            }, 2000); 
+        }
+
+        // --- 5. Hedef Oluşturma (Çakışma Kontrollü ve Renkli Metinler) ---
+        function createTarget() {
+            if (!font) return; 
+
+            const difficulty = getDifficulty(score);
+
+            const isBad = Math.random() < 0.5;
+            const values = isBad ? badValues : goodValues;
+            const rawName = values[Math.floor(Math.random() * values.length)];
+            const name = cleanTurkish(rawName);
+
+            const textGeometry = new THREE.TextGeometry(name, {
+                font: font,
+                size: 2, 
+                height: 0.3, 
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 0.1,
+                bevelSize: 0.05,
+                bevelSegments: 5
+            });
+            textGeometry.computeBoundingBox(); 
+
+            // Rastgele canlı bir renk seçimi
+            const randomColor = new THREE.Color(Math.random() * 0xffffff);
+            const material = new THREE.MeshPhongMaterial({ 
+                color: randomColor,
+                emissive: randomColor, 
+                emissiveIntensity: 0.3
+            });
+            const target = new THREE.Mesh(textGeometry, material);
+
+            textGeometry.translate(
+                -0.5 * (textGeometry.boundingBox.max.x - textGeometry.boundingBox.min.x),
+                -0.5 * (textGeometry.boundingBox.max.y - textGeometry.boundingBox.min.y),
+                -0.5 * (textGeometry.boundingBox.max.z - textGeometry.boundingBox.min.z)
+            );
+
+            let xPos, yPos, zDistance;
+            let attempts = 0;
+            const safeDistance = 10; 
+            
+            do {
+                zDistance = -100 - Math.random() * 100; 
+                xPos = (Math.random() - 0.5) * 60;
+                yPos = (Math.random() - 0.5) * 40;
+                
+                let isOverlapping = false;
+                for (const existingTarget of targets) {
+                    if (Math.abs(existingTarget.position.z - zDistance) < safeDistance &&
+                        existingTarget.position.distanceTo(new THREE.Vector3(xPos, yPos, zDistance)) < safeDistance) {
+                        isOverlapping = true;
+                        break;
+                    }
+                }
+                if (!isOverlapping) break;
+                attempts++;
+            } while (attempts < 20); 
+
+            target.position.set(xPos, yPos, zDistance);
+            target.lookAt(camera.position); 
+            
+            target.userData = {
+                isBad: isBad,
+                name: name,
+                speed: difficulty.speedBase + Math.random() * 0.1, 
+                baseSpeed: difficulty.speedBase, 
+                oscillation: new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.05 * difficulty.oscillationFactor, 
+                    (Math.random() - 0.5) * 0.05 * difficulty.oscillationFactor, 
+                    0
+                ),
+                timeOffset: Math.random() * Math.PI * 2 
+            };
+
+            if (isBad) {
+                const ringGeometry = new THREE.RingGeometry(2.5, 2.7, 32); 
+                const ringMaterial = new THREE.MeshBasicMaterial({ 
+                    color: 0xFF0000, 
+                    side: THREE.DoubleSide, 
+                    transparent: true, 
+                    opacity: 0.7,
+                    depthWrite: false
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.position.z = -0.5; 
+                target.add(ring); 
+            }
+            
+            scene.add(target);
+            targets.push(target);
+        }
+
+        // --- 6. Ateş Animasyonu ve Vuruş Mantığı ---
+        function createShot() {
+            if (isPaused) return; // Duraklatılmışsa ateş etme
+
+            const shotGeometry = new THREE.SphereGeometry(0.2, 8, 8); 
+            const shotMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, emissive: 0x00FF00, emissiveIntensity: 2 }); 
+            const shot = new THREE.Mesh(shotGeometry, shotMaterial);
+            
+            shot.position.copy(camera.position); 
+            
+            const direction = new THREE.Vector3();
+            raycaster.setFromCamera(mouse, camera); 
+            direction.copy(raycaster.ray.direction).normalize();
+
+            shot.userData.direction = direction;
+            shot.userData.speed = 1; 
+            
+            scene.add(shot);
+            shots.push(shot);
+        }
+
+        document.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        document.addEventListener('click', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+            createShot();
+        }, false);
+        
+        function processHit(hitTarget) {
+            
+            if (hitTarget.userData.isBad) {
+                score += 10; 
+            } else {
+                score -= 10; 
+            }
+            
+            const explosion = new THREE.PointLight(0xFFD700, 5, 20);
+            explosion.position.copy(hitTarget.position);
+            scene.add(explosion);
+            setTimeout(() => { scene.remove(explosion); }, 300);
+
+            scene.remove(hitTarget);
+            targets.splice(targets.indexOf(hitTarget), 1);
+            scoreElement.textContent = score;
+        }
+
+        // --- 7. Animasyon Döngüsü (Pause Kontrolü Eklendi) ---
+        let clock = new THREE.Clock();
+
+        function animate() {
+            if (!font) {
+                 requestAnimationFrame(animate);
+                 return;
+            }
+
+            if (isPaused) {
+                // Duraklatıldığında sadece render yap, hareket etme
+                renderer.render(scene, camera);
+                return; 
+            }
+
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+            const difficulty = getDifficulty(score);
+
+            if (difficulty.level !== lastLevel) {
+                difficultyElement.textContent = `${difficulty.level} (${difficulty.levelName})`;
+                showAlert(`SEVİYE ${difficulty.level}! ZORLUK ARTTI! Hızlandı!`);
+                
+                targets.forEach(target => {
+                    target.userData.speed = difficulty.speedBase + Math.random() * 0.1; 
+                    target.userData.oscillation = new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.05 * difficulty.oscillationFactor, 
+                        (Math.random() - 0.5) * 0.05 * difficulty.oscillationFactor, 
+                        0
+                    );
+                });
+
+                lastLevel = difficulty.level;
+            }
+            
+            // Gezegenleri ve Yıldızları Döndür
+            stars.rotation.x += 0.00005; 
+            stars.rotation.y += 0.0001;
+            planets.forEach(p => { 
+                p.rotation.y += 0.0002 + Math.random() * 0.0001;
+                p.rotation.x += 0.0001 + Math.random() * 0.00005;
+            });
+            
+            // Kuyruklu Yıldızları Güncelle
+            cometSpawnTimer += delta;
+            if (cometSpawnTimer >= cometSpawnInterval) {
+                createComet();
+                cometSpawnTimer = 0;
+            }
+
+            for (let i = 0; i < comets.length; i++) {
+                const comet = comets[i];
+                comet.position.add(comet.userData.direction.clone().multiplyScalar(comet.userData.speed * delta * 60));
+                comet.userData.lifetime++;
+
+                const tailPositions = comet.children[0].geometry.attributes.position.array;
+                for(let j = tailPositions.length / 3 - 1; j > 0; j--) {
+                    tailPositions[j * 3] = tailPositions[(j - 1) * 3];
+                    tailPositions[j * 3 + 1] = tailPositions[(j - 1) * 3 + 1];
+                    tailPositions[j * 3 + 2] = tailPositions[(j - 1) * 3 + 2];
+                }
+                tailPositions[0] = 0; 
+                tailPositions[1] = 0;
+                tailPositions[2] = 0;
+                comet.children[0].geometry.attributes.position.needsUpdate = true;
+
+
+                if (comet.userData.lifetime > comet.userData.maxLifetime || comet.position.z > camera.position.z + 50) { 
+                    scene.remove(comet);
+                    comets.splice(i, 1);
+                    i--;
+                }
+            }
+
+            // Hedefleri Güncelle
+            for (let i = 0; i < targets.length; i++) {
+                const target = targets[i];
+                
+                target.position.z += target.userData.speed * delta * 60; 
+
+                target.position.x += target.userData.oscillation.x * Math.sin(target.userData.timeOffset + performance.now() * 0.001);
+                target.position.y += target.userData.oscillation.y * Math.cos(target.userData.timeOffset + performance.now() * 0.001);
+                
+                if (target.position.z > 8) {
+                    scene.remove(target);
+                    targets.splice(i, 1);
+                    i--;
+                }
+            }
+            
+            // Lazer Mermilerini Güncelle ve Çarpışma Kontrolü Yap
+            for (let i = 0; i < shots.length; i++) {
+                const shot = shots[i];
+                shot.position.add(shot.userData.direction.clone().multiplyScalar(shot.userData.speed * 60 * delta)); 
+
+                if (shot.position.z < -200) { 
+                    scene.remove(shot);
+                    shots.splice(i, 1);
+                    i--;
+                    continue; 
+                }
+
+                const shotBox = new THREE.Box3().setFromObject(shot);
+                let hitTargetIndex = -1;
+                for (let j = 0; j < targets.length; j++) {
+                    const target = targets[j];
+                    const targetBox = new THREE.Box3().setFromObject(target);
+                    
+                    if (shotBox.intersectsBox(targetBox)) {
+                        hitTargetIndex = j;
+                        break;
+                    }
+                }
+
+                if (hitTargetIndex !== -1) {
+                    processHit(targets[hitTargetIndex]); 
+                    scene.remove(shot);
+                    shots.splice(i, 1);
+                    i--;
+                }
+            }
+            
+            // Rastgele aralıklarla yeni hedef oluştur
+            if (Math.random() < difficulty.spawnRate && targets.length < difficulty.maxTargets) { 
+                createTarget();
+            }
+
+            renderer.render(scene, camera);
+        }
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

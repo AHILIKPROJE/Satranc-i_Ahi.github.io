@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Görüntü Ayarları</title>
+  <style>
+    :root{
+      --panel-width: 720px;
+      --panel-padding: 28px;
+      --panel-radius: 18px;
+      --gold1: #d4af37;
+      --gold2: #ffdf80;
+      --glass-bg: rgba(10,10,10,0.45);
+      --bg-bright: 1;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;color:#f6f3ea}
+
+    .bg-image{
+      position:fixed;inset:0;z-index:0;
+      background-image: url('https://www.peramuzesi.org.tr/Repo/StaticContent/Images/muzik3.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+      filter: brightness(var(--bg-bright));
+      transition:filter 0.14s linear, transform 0.18s ease;
+    }
+
+    .bg-overlay{
+      position:fixed;inset:0;background:linear-gradient(rgba(0,0,0,0.22), rgba(0,0,0,0.34));pointer-events:none;z-index:1;
+    }
+
+    .panel-wrap{position:relative;z-index:5;display:flex;align-items:center;justify-content:center;height:100vh}
+    .panel{
+      width:clamp(320px, var(--panel-width), 92vw);
+      padding:var(--panel-padding);
+      border-radius:var(--panel-radius);
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.12));
+      backdrop-filter: blur(8px) saturate(120%);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      position:relative;
+      margin:16px;
+    }
+
+    .panel:before{
+      content:"";
+      position:absolute;inset:-6px;border-radius:calc(var(--panel-radius) + 6px);
+      padding:2px;
+      background: conic-gradient(from 90deg at 50% 50%, var(--gold1), var(--gold2), #ffd24d, var(--gold1));
+      -webkit-mask: 
+        linear-gradient(#000 0 0) content-box, 
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events:none;
+    }
+
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    h1{font-size:20px;margin:0}
+    p.small{margin:0;font-size:12px;opacity:0.9}
+
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+    .control{display:flex;flex-direction:column;gap:8px}
+    label{font-size:13px;color:#f5ecd8}
+    select,input[type=range],.btn{appearance:none}
+    select,input,button{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.35);color:#f6f3ea}
+
+    .full-row{grid-column:1/-1}
+
+    .range-wrap{display:flex;align-items:center;gap:12px}
+    .range-wrap input[type=range]{flex:1;appearance:none;height:10px;border-radius:999px;background:linear-gradient(90deg,#444 0 0);outline:none}
+    .range-wrap input[type=range]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,var(--gold2),var(--gold1));box-shadow:0 2px 6px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.06)}
+    .range-wrap input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,var(--gold2),var(--gold1));border:2px solid rgba(255,255,255,0.06)}
+
+    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+    .btn{cursor:pointer;border:none;padding:10px 14px;font-weight:600}
+    .btn.apply{height:50px;background:linear-gradient(180deg, rgba(212,175,55,0.12), rgba(255,255,255,0.02));border:1px solid rgba(212,175,55,0.28)}
+    .btn.reset{height:50px;background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .btn.menu{height:50px;background:linear-gradient(180deg, rgba(255,215,0,0.15), rgba(255,255,255,0.02));border:1px solid rgba(255,215,0,0.28)}
+
+    @media (max-width:600px){
+      :root{--panel-padding:18px}
+      .controls{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-image" aria-hidden="true"></div>
+  <div class="bg-overlay" aria-hidden="true"></div>
+
+  <div class="panel-wrap">
+    <div class="panel" role="dialog" aria-labelledby="title">
+      <header>
+        <div>
+          <h1 id="title">Görüntü Ayarları</h1>
+          <p class="small">Ekran ve grafik tercihlerini buradan düzenleyin</p>
+        </div>
+        <div class="small">4K-like • Tam ekran desteği</div>
+      </header>
+
+      <form id="settings-form" onsubmit="return false;">
+        <div class="controls">
+          <div class="control">
+            <label for="resolution">Çözünürlük</label>
+            <select id="resolution" name="resolution" aria-label="Çözünürlük">
+              <option value="3840x2160">3840 × 2160 (4K)</option>
+              <option value="2560x1440">2560 × 1440 (QHD)</option>
+              <option value="1920x1080" selected>1920 × 1080 (Full HD)</option>
+              <option value="1280x720">1280 × 720 (HD)</option>
+            </select>
+          </div>
+
+          <div class="control">
+            <div class="fullscreen-row" style="display:flex;align-items:center;gap:10px;">
+              <label for="fullscreen">Tam Ekran</label>
+              <input id="fullscreen" type="checkbox" aria-label="Tam ekran" style="width:18px;height:18px;" />
+              <label for="fullscreen" style="font-size:13px;opacity:0.9">Etkinleştir</label>
+            </div>
+          </div>
+
+          <div class="control full-row">
+            <label for="brightness">Parlaklık <span id="bright-val" style="font-weight:700">1.00</span></label>
+            <div class="range-wrap">
+              <input id="brightness" type="range" min="0.4" max="1.6" step="0.01" value="1" />
+            </div>
+          </div>
+
+          <div class="control full-row">
+            <label for="quality">Grafik Kalitesi</label>
+            <select id="quality" name="quality">
+              <option value="low">Düşük</option>
+              <option value="medium">Orta</option>
+              <option value="high" selected>Yüksek</option>
+              <option value="ultra">Ultra</option>
+            </select>
+          </div>
+
+          <div class="control full-row">
+            <label for="fps">FPS Limiti (opsiyonel)</label>
+            <select id="fps" name="fps">
+              <option value="0">Sınırsız</option>
+              <option value="30">30</option>
+              <option value="60" selected>60</option>
+              <option value="144">144</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions" style="display:flex;justify-content:center;gap:14px;margin-top:24px;">
+          <button class="btn apply" id="apply" style="width:120px;height:45px;font-size:15px;">Uygula</button>
+          <button class="btn reset" id="reset" style="width:120px;height:45px;font-size:15px;">Sıfırla</button>
+          <button class="btn menu" id="menuBtn" style="width:120px;height:45px;font-size:15px;">Ana Menüye Dön</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const brightness = document.getElementById('brightness');
+    const brightVal = document.getElementById('bright-val');
+    const resolution = document.getElementById('resolution');
+    const fullscreen = document.getElementById('fullscreen');
+    const quality = document.getElementById('quality');
+    const fps = document.getElementById('fps');
+    const apply = document.getElementById('apply');
+    const reset = document.getElementById('reset');
+    const menuBtn = document.getElementById('menuBtn');
+    const bgImage = document.querySelector('.bg-image');
+
+    function updateUIValues(){
+      brightVal.textContent = parseFloat(brightness.value).toFixed(2);
+    }
+
+    function applyFilters(){
+      const b = parseFloat(brightness.value);
+      let contrast = 1, blur = 0, saturate = 1;
+      switch(quality.value){
+        case 'low': contrast = 0.92; blur = 0.8; saturate = 0.95; break;
+        case 'medium': contrast = 1; blur = 0.4; saturate = 1; break;
+        case 'high': contrast = 1.04; blur = 0; saturate = 1.04; break;
+        case 'ultra': contrast = 1.08; blur = 0; saturate = 1.08; break;
+      }
+      bgImage.style.filter = `brightness(${b}) contrast(${contrast}) saturate(${saturate}) blur(${blur}px)`;
+      document.documentElement.style.setProperty('--bg-bright', b);
+    }
+
+    brightness.addEventListener('input', ()=>{ updateUIValues(); applyFilters(); });
+    quality.addEventListener('change', applyFilters);
+
+    resolution.addEventListener('change', ()=>{ showToast(`Çözünürlük seçildi: ${resolution.value}`); });
+
+    fullscreen.addEventListener('change', async ()=>{
+      if(fullscreen.checked){
+        try{ await document.documentElement.requestFullscreen(); }
+        catch(err){ console.warn('Fullscreen hatası', err); fullscreen.checked = false; }
+      }else{
+        if(document.fullscreenElement) await document.exitFullscreen();
+      }
+    });
+
+    apply.addEventListener('click', ()=>{ applyFilters(); showToast('Ayarlar uygulandı'); });
+    reset.addEventListener('click', ()=>{
+      resolution.value = '1920x1080';
+      fullscreen.checked = false;
+      brightness.value = 1;
+      quality.value = 'high';
+      fps.value = '60';
+      updateUIValues();
+      applyFilters();
+      if(document.fullscreenElement) document.exitFullscreen();
+      showToast('Ayarlar sıfırlandı');
+    });
+
+    menuBtn.addEventListener('click', ()=>{
+      window.location.href = "index.html";
+    });
+
+    function showToast(msg){
+      const t = document.createElement('div');
+      t.textContent = msg;
+      Object.assign(t.style,{position:'fixed',left:'50%',transform:'translateX(-50%)',bottom:'36px',background:'rgba(0,0,0,0.6)',padding:'10px 14px',borderRadius:'10px',zIndex:999,fontWeight:600});
+      document.body.appendChild(t);
+      setTimeout(()=>t.style.opacity='0',1400);
+      setTimeout(()=>t.remove(),2000);
+    }
+
+    updateUIValues();
+    applyFilters();
+
+    document.addEventListener('keydown', e=>{
+      if(e.key==='Escape' && document.fullscreenElement){ fullscreen.checked = false; }
+    });
+  </script>
+</body>
+</html>
+

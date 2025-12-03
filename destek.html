@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yardım & Destek</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #08121f, #0f2236);
+        font-family: 'Segoe UI', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* Arka planda hafif motif */
+    .bg-pattern {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0.04;
+        background-image: url('https://i.imgur.com/3PBZQxH.png');
+        background-size: 350px;
+        background-repeat: repeat;
+        pointer-events: none;
+    }
+
+    .container {
+        position: relative;
+        width: 90%;
+        max-width: 450px;
+        padding: 30px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.18);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        animation: fadeIn 0.9s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.96); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    h2 {
+        color: #ffffff;
+        text-align: center;
+        margin-bottom: 5px;
+        font-size: 30px;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    .divider {
+        width: 70%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #4fa3ff, transparent);
+        margin: 5px auto 20px;
+    }
+
+    label {
+        color: #dfe7f1;
+        font-size: 15px;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 13px;
+        margin-bottom: 18px;
+        border: none;
+        border-radius: 12px;
+        outline: none;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        font-size: 15px;
+        transition: 0.2s;
+    }
+
+    input:focus, textarea:focus {
+        background: rgba(255,255,255,0.18);
+        transform: scale(1.01);
+    }
+
+    textarea {
+        resize: none;
+        height: 130px;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: #4fa3ff;
+        color: white;
+        font-size: 17px;
+        cursor: pointer;
+        transition: 0.25s;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background: #71b8ff;
+        transform: translateY(-2px);
+    }
+
+    .back-btn {
+        width: 120px;
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.15);
+        color: #ffffff;
+        text-align: center;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .back-btn:hover {
+        background: rgba(255,255,255,0.25);
+        transform: translateY(-2px);
+    }
+
+    .status {
+        margin-top: 12px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .ok { color: #00ff7b; }
+    .err { color: #ff4d4d; }
+
+</style>
+
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<div class="container">
+    <h2>Yardım & Destek</h2>
+    <div class="divider"></div>
+
+    <label>Kullanıcı Maili</label>
+    <input id="email" placeholder="E-posta adresinizi yazın">
+
+    <label>Sorununuz</label>
+    <textarea id="message" placeholder="Yaşadığınız problemi ayrıntılı şekilde yazın"></textarea>
+
+    <button onclick="sendReport()">Sorunu Gönder</button>
+
+    <div class="back-btn" onclick="window.location='index.html'">← Geri Dön</div>
+
+    <div id="status"></div>
+</div>
+
+<script>
+async function sendReport() {
+    const email = document.getElementById("email").value.trim();
+    const message = document.getElementById("message").value.trim();
+    const statusBox = document.getElementById("status");
+
+    if (!email || !message) {
+        statusBox.innerHTML = "<span class='err'>Tüm alanları doldurmalısınız!</span>";
+        return;
+    }
+
+    statusBox.innerHTML = "<span style='color:white;'>Gönderiliyor...</span>";
+
+    try {
+        const response = await fetch(
+            "https://script.google.com/macros/s/AKfycbzjC7DqdH__0SDW8txL9Uzt9FqcaWj0HbkivsokvSysQxDHkwC1E4mSgp2dThqP4j8/exec",
+            {
+                method: "POST",
+                body: JSON.stringify({ userEmail: email, message: message })
+            }
+        );
+
+        const result = await response.json();
+
+        if (result.status === "OK") {
+            statusBox.innerHTML = "<span class='ok'>Sorun başarıyla gönderildi!</span>";
+        } else {
+            statusBox.innerHTML = "<span class='err'>Gönderilemedi! Sunucu hatası.</span>";
+        }
+    } catch (e) {
+        statusBox.innerHTML = "<span class='err'>Bağlantı hatası!</span>";
+    }
+}
+</script>
+
+</body>
+</html>

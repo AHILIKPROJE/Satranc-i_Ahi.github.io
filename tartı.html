@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Kese Oyunu - Geri Alma</title>
+<style>
+body {
+  margin:0;
+  font-family:sans-serif;
+  background: url('https://i.imgur.com/io8q24n.jpeg') no-repeat center center fixed;
+  background-size: cover;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+#game {
+  width:800px;
+  background: rgba(255,248,240,0.9);
+  border:3px solid #b07f3e;
+  border-radius:12px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 6px 15px rgba(0,0,0,0.3);
+}
+h1 { color:#5c3a1a; }
+
+#products {
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  margin:20px 0;
+}
+
+.product {
+  width:100px;
+  height:100px;
+  border:2px solid #b07f3e;
+  border-radius:8px;
+  cursor:grab;
+}
+
+#bag {
+  width:250px;
+  height:250px;
+  margin:0 auto;
+  border:2px dashed #b07f3e;
+  border-radius:12px;
+  background: rgba(255,255,255,0.7);
+  position: relative;
+}
+
+#adjustContainer {
+  margin-top:10px;
+}
+
+#feedback { margin-top:15px; font-weight:bold; }
+#respect { margin-top:10px; font-weight:bold; color:#333; }
+
+.buttonBack {
+  padding:8px 15px;
+  margin-bottom:10px;
+  border:none;
+  background:#b07f3e;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:15px;
+}
+</style>
+</head>
+<body>
+
+<div id="game">
+
+  <!-- 📌 GERİ DÖN BUTONU -->
+  <button class="buttonBack" onclick="history.back()">⟵ Geri Dön</button>
+
+  <h1>Kese Oyunu</h1>
+
+  <p id="customerRequest">Müşteri şunu istiyor: </p>
+
+  <div id="products">
+    <img src="https://i.imgur.com/JTPBndQ.png" class="product" draggable="true" data-type="et">
+    <img src="https://i.imgur.com/cwSPPli.png" class="product" draggable="true" data-type="peynir">
+    <img src="https://i.imgur.com/TsqDCaT.png" class="product" draggable="true" data-type="elma">
+  </div>
+
+  <div id="bag"></div>
+
+  <div id="adjustContainer">
+    <p>Torbadaki ürünü seçip miktarını geri al:</p>
+    <select id="bagSelect">
+      <option value="">Seçiniz</option>
+    </select>
+    <input type="range" id="slider" min="0" max="0" value="0">
+    <span id="sliderValue">0</span> gr
+    <button onclick="returnFromBag()">Geri Al</button>
+  </div>
+
+  <button onclick="serveBag()">Servis Et</button>
+  <div id="feedback"></div>
+  <div id="respect">Saygı Puanı: 100</div>
+</div>
+
+<script>
+let respect = 100;
+const products = ['et','peynir','elma'];
+let customerProduct = '';
+let customerGram = 0;
+
+let bagItems = []; // {type: 'et', weight: 100}
+
+function newCustomer(){
+  customerProduct = products[Math.floor(Math.random()*products.length)];
+  customerGram = Math.floor(Math.random()*1500)+50; 
+  document.getElementById('customerRequest').textContent = 
+    `Müşteri ${customerGram} gram ${customerProduct} istedi.`;
+  bagItems = [];
+  updateBagSelect();
+  updateBagFeedback();
+  slider.value = 0;
+  slider.max = 0;
+  document.getElementById('sliderValue').textContent = '0';
+}
+
+newCustomer();
+
+const bag = document.getElementById('bag');
+
+document.querySelectorAll('.product').forEach(p=>{
+  p.addEventListener('dragstart', e=>{
+    const randomGram = Math.floor(Math.random()*250)+50;
+    e.dataTransfer.setData('text/plain', randomGram);
+    e.dataTransfer.setData('type', p.dataset.type);
+  });
+});
+
+bag.addEventListener('dragover', e=>{ e.preventDefault(); });
+
+bag.addEventListener('drop', e=>{
+  e.preventDefault();
+  const w = parseInt(e.dataTransfer.getData('text/plain'));
+  const t = e.dataTransfer.getData('type');
+
+  if(t !== customerProduct){
+    alert(`Bu ürün müşteri tarafından istenmiyor!`);
+    return;
+  }
+
+  let existing = bagItems.find(item => item.type === t);
+  if(existing){
+    existing.weight += w;
+  } else {
+    bagItems.push({type: t, weight: w});
+  }
+
+  updateBagSelect();
+  updateBagFeedback();
+});
+
+function updateBagSelect(){
+  const select = document.getElementById('bagSelect');
+  select.innerHTML = '<option value="">Seçiniz</option>';
+  bagItems.forEach((item,index)=>{
+    select.innerHTML += `<option value="${index}">${item.type} - ${item.weight} gr</option>`;
+  });
+  updateSlider();
+}
+
+function updateSlider(){
+  const idx = document.getElementById('bagSelect').value;
+  if(idx === ''){
+    slider.max = 0;
+    slider.value = 0;
+    sliderValue.textContent = '0';
+  } else {
+    slider.max = bagItems[idx].weight;
+    slider.value = 0;
+    sliderValue.textContent = '0';
+  }
+}
+
+bagSelect.addEventListener('change', updateSlider);
+
+slider.addEventListener('input', ()=>{
+  sliderValue.textContent = slider.value;
+});
+
+function returnFromBag(){
+  const idx = document.getElementById('bagSelect').value;
+  if(idx === '') return;
+  const reduce = parseInt(slider.value);
+  if(reduce > bagItems[idx].weight){
+    alert("Mevcut miktardan fazla geri alamazsınız!");
+    return;
+  }
+  bagItems[idx].weight -= reduce;
+  if(bagItems[idx].weight === 0) bagItems.splice(idx,1);
+  updateBagSelect();
+  updateBagFeedback();
+}
+
+function updateBagFeedback(){
+  const total = bagItems.reduce((sum,item)=>sum+item.weight,0);
+  document.getElementById('feedback').textContent = `Torbadaki toplam: ${total} gr`;
+}
+
+function serveBag(){
+  const total = bagItems.reduce((sum,item)=>sum+item.weight,0);
+  const diff = total - customerGram;
+  let feedback='';
+
+  if(diff >= -50 && diff <= 50){
+    feedback = `✅ Miktar uygun!`;
+  } else if(diff < -50){
+    feedback = `❌ Az verdin! Saygı puanı düştü.`;
+    respect -= 10;
+  } else if(diff > 50){
+    feedback = `❌ Çok verdin! Saygı puanı düştü.`;
+    respect -= 5;
+  }
+
+  document.getElementById('feedback').textContent = feedback;
+  document.getElementById('respect').textContent = "Saygı Puanı: " + respect;
+
+  newCustomer();
+}
+</script>
+
+</body>
+</html>

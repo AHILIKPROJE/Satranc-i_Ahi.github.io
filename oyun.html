@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  
+<meta charset="utf-8">
+<title>Ürefa - Zamanlı Oyun (XP & Level Sistemli)</title>
+<style>
+:root{
+  --board-size:700px;
+  --frame-color:#3b1f0b;
+  --frame-bg:#5c3a1a;
+  --cell-bg:#f5f5dc;
+  --cell-border:#c9a86e;
+}
+html,body{margin:0;padding:0;width:100%;height:100%;background:#22262f;display:flex;align-items:center;justify-content:center;font-family:Arial,Helvetica,sans-serif;}
+#container{display:flex;gap:36px;align-items:flex-start;}
+#board-frame{
+  width:var(--board-size);height:var(--board-size);background:var(--frame-bg);
+  border:10px solid var(--frame-color);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.6);position:relative;
+}
+#board{
+  position:absolute; left:4%; top:4%; width:92%; height:92%;
+  background:#d2b48c;border-radius:6px; box-shadow: inset 0 0 18px rgba(0,0,0,0.25); overflow:hidden;
+}
+.cell{
+  position:absolute;
+  box-sizing:border-box;
+  background:var(--cell-bg);
+  border:1px solid var(--cell-border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+  color:#5a4a32;
+  overflow:visible;
+}
+.cellIcon{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;user-select:none;
+  display:flex;align-items:center;justify-content:center;z-index:30;
+}
+.piece{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:60px;height:60px;border-radius:50%;
+  background:radial-gradient(circle,#ffd700 0%,#ff9900 80%);
+  box-shadow:0 0 18px rgba(255,200,20,0.9), inset 0 -6px 10px rgba(0,0,0,0.15);
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;
+  z-index:100;transition: transform 180ms linear;
+}
+#valueDisplay{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0.9);
+  display:none; z-index:600; background:linear-gradient(135deg,#fff1c6,#f0d8a6);
+  color:#5a2e0d; padding:22px 28px;border-radius:16px;border:3px solid #8b5a2b;
+  font-family:'Georgia',serif; font-size:1.1rem; font-weight:bold; text-align:center;
+  box-shadow:0 0 25px rgba(255,215,0,0.7), inset 0 0 15px rgba(255,255,224,0.5); opacity:0; transition:all .35s ease;
+}
+#valueDisplay.show{ display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
+/* MiniGame Butonu */
+.miniGameArea {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+#miniGameBtn {
+  font-size: 20px;
+  font-weight: bold;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #ffd700, #ffb700);
+  color: #000;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#miniGameBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 1);
+}
+
+/* Popup */
+.popup {
+  display: none; 
+  position: fixed; 
+  z-index: 999; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.7);
+}
+
+.popupContent {
+  background-color: #1f2937;
+  margin: 10% auto; 
+  padding: 20px;
+  border: 3px solid #ffd700;
+  border-radius: 15px;
+  width: 350px;
+  text-align: center;
+  color: #fff;
+}
+
+#closePopup {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.card {
+  background: linear-gradient(135deg, #ffb700, #ffd700);
+  color: #000;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
+/* --- LEVEL BAR --- */
+#levelBox{
+  background:#fff;padding:10px;border-radius:10px;margin-bottom:14px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.4);color:#000;font-weight:bold;
+}
+#levelName{text-align:center;font-size:18px;margin-bottom:6px;}
+#xpBar{
+  width:100%;height:22px;background:#5e5c5c;border-radius:10px;overflow:hidden;
+}
+#xpFill{
+  height:100%;width:0%;background:linear-gradient(120deg,#00d09c,#0d8f43);
+}
+#xpText{
+  position:relative;top:-20px;text-align:center;font-size:13px;font-weight:bold;color:#000;
+}
+
+/* CONTROLS */
+#controls{width:260px;color:#fff;}
+.controlsCard{background:linear-gradient(180deg,#2b2f33,#222);padding:16px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+.buttonArea{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#000;font-weight:700;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.4);}
+#dice{width:52px;height:52px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#000;}
+#diceTime{background:linear-gradient(120deg,#ffd700,#ff9900);color:#000;font-weight:700;padding:6px 10px;border-radius:8px;}
+#timer{background:linear-gradient(120deg,#ff5a5a,#ff0000);color:#fff;font-weight:bold;padding:10px;border-radius:10px;font-size:1.2rem;text-align:center;margin-top:8px;}
+.rollAnim{animation:roll 900ms ease;}
+@keyframes roll{0%{transform:rotateX(0) rotateY(0) scale(1);}25%{transform:rotateX(180deg) rotateY(90deg) scale(1.25);}50%{transform:rotateX(360deg) rotateY(180deg) scale(1.1);}75%{transform:rotateX(540deg) rotateY(270deg) scale(1.15);}100%{transform:rotateX(720deg) rotateY(360deg) scale(1);}}
+
+.explosion{position:absolute;width:120px;height:120px;border-radius:50%;pointer-events:none;z-index:550;transform:translate(-50%,-50%) scale(0);opacity:0.9;animation:explode 0.6s forwards;}
+@keyframes explode{0%{transform:translate(-50%,-50%) scale(0);opacity:1;}50%{transform:translate(-50%,-50%) scale(1.2);opacity:0.9;}100%{transform:translate(-50%,-50%) scale(1);opacity:0;}}
+
+.questionPopup{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:#fff;padding:18px;border-radius:12px;z-index:700;width:360px;text-align:center;
+  font-family:Arial;box-shadow:0 8px 48px rgba(0,0,0,0.6);
+}
+.questionPopup button{margin:8px;padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(120deg,#00d09c,#00b387);color:#000;font-weight:bold;cursor:pointer;}
+
+.restartBtn{
+  margin-top:14px;padding:8px 14px;border:none;border-radius:8px;
+  background:#00d09c;color:#000;font-weight:bold;cursor:pointer;
+}
+
+.infoPopup{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:#fff;color:#000;padding:20px;border-radius:12px;z-index:800;width:400px;text-align:center;
+  box-shadow:0 8px 48px rgba(0,0,0,0.6);
+}
+
+/* --- GAME OVER POPUP --- */
+.gameOverOverlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;z-index:9999;
+}
+.gameOverBox{
+  background:#fff;border-radius:12px;padding:22px;width:360px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.6);
+  font-weight:700;color:#222;
+}
+.gameOverBox h2{margin:0 0 8px 0;font-size:20px;}
+.gameOverBox p{margin:6px 0 16px 0;font-weight:600;color:#333;}
+.gameOverBox .btns{display:flex;gap:12px;justify-content:center;}
+.gameOverBox .btns button{flex:1;padding:10px;border-radius:10px;border:none;cursor:pointer;font-weight:800;}
+.gameOverBox .btn-restart{background:linear-gradient(120deg,#00d09c,#00b387);color:#000;}
+.gameOverBox .btn-menu{background:linear-gradient(120deg,#ffd700,#ff9900);color:#000;}
+  .startBtnArea {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+#rollBtn {
+    font-size: 22px;
+    font-weight: bold;
+    padding: 14px 30px;
+    background: linear-gradient(135deg, #ffd700, #ffb700);
+    color: #000;
+    border: 3px solid #fff;
+    border-radius: 14px;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#rollBtn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 22px rgba(255, 215, 0, 1);
+}
+
+</style>
+</head>
+<body>
+<div class="chest" id="chest" style="display:none;">
+    <div class="top"></div>
+    <div class="bottom"></div>
+    <div class="lock"></div>
+    <div class="light"></div>
+</div>
+<div id="reward"></div>
+  
+
+
+<div id="container">
+
+  <div id="board-frame">
+    <div id="board"></div>
+    <div id="valueDisplay"></div>
+    <div class="piece" id="piece">P</div>
+  </div>
+
+  <div id="controls">
+
+    <!-- XP – LEVEL KISMI -->
+    <div id="levelBox">
+      <div id="levelName">Yamaklık</div>
+      <div id="xpBar">
+        <div id="xpFill"></div>
+      </div>
+      <div id="xpText">0 / 100 XP</div>
+    </div>
+
+    <div class="controlsCard">
+      <div class="buttonArea">
+        <button id="rollBtn">🎲 Başla</button>
+        <div id="dice">1</div>
+        <div id="diceTime">3s</div>
+      </div>
+
+      <div id="timer">02:30</div>
+
+<div id="superpowers">
+    <button id="spPlusTwo">+2 İlerleme (10 AKÇE)</button>
+    <button id="spPlusTime">+10 Saniye (10 AKÇE)</button>
+    <button id="spAutoAnswer">Oto Cevap (10 AKÇE)</button>
+    <button id="spMinFour">Min 4 Zar (10 AKÇE)</button>
+</div>
+ <!-- Super Güçler altına eklenecek MiniGame butonu -->
+<div class="miniGameArea">
+  <button id="miniGameBtn">🎴 MiniGame</button>
+</div>
+
+<!-- Popup -->
+<div id="miniGamePopup" class="popup">
+  <div class="popupContent">
+    <span id="closePopup">&times;</span>
+    <h2>MiniGame</h2>
+    <div class="cards">
+      <div class="card" data-link="tartı.html">1. Tartı</div>
+      <div class="card" data-link="helal.html">2. Helal/Haram</div>
+      <div class="card" data-link="soz.html">3. Söz</div>
+     <div class="card" data-link="lazer.html">4. Lazer</div>
+    </div>
+  </div>
+</div>
+ 
+      <div class="infoRow" style="margin-top:12px;color:#fff;">
+        <div>Akçe: <span class="akceBox" id="akce">50</span></div>
+        <div>Toplam: <span id="moveCount">0</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="infoPopup" id="infoPopup">
+  <h1>-Oyun Bilgisi-</h1>
+  <p>*🦊 Tilki sizi 3 kare geri getirir.<br>
+    * 🐴 At sizi 3 kare ileri taşır.<br>
+ *Güç satın alarak ilerlemenizi kolaylaştırabilirsiniz.<br>
+*Oyun sonlarında sandık açarak akçe kazanabilirsiniz.<br>
+    * Her 8 karede bir soru çıkar.<br>
+    * Doğru cevap verirsen ilerler.<br>
+    * Yanlış cevapta süre -10 saniye.</p>
+  <button id="infoOkBtn">Anladım</button>
+</div>
+<!-- Meslek Popup -->
+<div class="jobPopup" id="jobPopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:2px solid #000; z-index:1000;">
+  <h3>Mesleğini Seç</h3>
+  <button onclick="selectJob('Marangoz')">Marangoz</button>
+  <button onclick="selectJob('Debbağ')">Debbağ</button>
+  <button onclick="selectJob('Tüccar')">Tüccar</button>
+  <button onclick="selectJob('Demirci')">Demirci</button>
+</div>
+<div id="playerJobDisplay" style="position:fixed; bottom:10px; right:10px; background:#d6a67c; padding:10px 10px; border:3px solid #000; z-index:999;">
+  Meslek: Henüz seçilmedi
+</div>
+
+<script>
+ const jobs = {
+  "Marangoz": { 
+    skill: "Her hamlede +1 kare ilerler",
+    onMove: (val) => val + 1 // Zar değerine +1 ekler
+  },
+  "Debbağ": { 
+    skill: "Oyuna +30 saniye eklenir",
+    onStart: () => { totalSeconds += 30; } // Oyuna başlarken uygulanır
+  },
+  "Tüccar": { 
+    skill: "Super güçlerin fiyatlarını %20 düşürür",
+    onBuyPower: (price) => Math.floor(price * 0.8) // Güç alırken uygulanır
+  },
+  "Demirci": { 
+    skill: "İlk zar atışı 6 gelir",
+    onFirstRoll: () => 6 // İlk zar 6 gelir
+  }
+};
+
+
+
+// XP SİSTEMİ -----------------------------------------------------
+let totalXP = 0;
+let level = 0;
+const levelNames = ["Yamaklık","Çırak","Kalfa","Usta","Ahi Şefi"];
+const XP_PER_LEVEL = 100;
+
+function updateXPBar(){
+  document.getElementById("levelName").textContent = levelNames[level];
+
+  let current = totalXP % XP_PER_LEVEL;
+  let percent = (current / XP_PER_LEVEL) * 100;
+
+  document.getElementById("xpFill").style.width = percent + "%";
+  document.getElementById("xpText").textContent = `${current} / ${XP_PER_LEVEL} XP`;
+}
+
+function addXP(amount){
+  totalXP += amount;
+  let newLevel = Math.floor(totalXP / XP_PER_LEVEL);
+  if(newLevel > level && newLevel < levelNames.length){
+    level = newLevel;
+  }
+  updateXPBar();
+}
+
+// --- OYUN DEĞİŞKENLERİ ---
+let playerAkce = 50;
+const ROWS = 7, COLS = 7;
+const TOTAL = ROWS * COLS;
+let positions = [], cells = [], piecePos = 0;
+let canRoll = false, gameOver = false, moveCount = 0;
+let totalSeconds = 150;
+// MESLEK SİSTEMİ DEĞİŞKENLERİ
+let selectedJob = null;     // Oyuncunun seçtiği meslek
+let firstRoll = false;      // Demirci için ilk zar garantisi
+
+// infoPopup'taki Anladım butonuna tıklayınca meslek popup açılır
+document.getElementById("infoOkBtn").addEventListener("click", function(){
+  document.getElementById("infoPopup").style.display = "none"; // bilgi popup kapat
+  document.getElementById("jobPopup").style.display = "block"; // meslek popup aç
+});
+
+// Meslek seçme fonksiyonu
+function selectJob(jobName){
+  playerJob = jobName; // seçilen meslek kaydedilir
+  document.getElementById("jobPopup").style.display = "none"; // popup kapat
+  document.getElementById("playerJobDisplay").textContent = "Meslek: " + jobName; // sağ alt köşede göster
+}
+
+// Sorular -------------------------------------------------------
+let questions = [
+  {q:"Ahilik kelimesinin anlamı aşağıdakilerden hangisidir?", a:["İktidar sahibi","Kardeşim / eli açık","Zengin esnaf","Cömert esnaf"], correct:1, hint:"Ahilik kardeşlik ve paylaşım temelli bir sistemdir."},
+  {q:"Ahi Evran’ın doğum yeri neresidir?", a:["Kırşehir","Kayseri","Hoy (İran)","Konya"], correct:2, hint:"Anadolu dışında bir merkez."},
+  {q:"Ahi Evran, Ahilik teşkilatını özellikle hangi meslek gruplarıyla kurmuştur?", a:["Dericiler ve tüccarlar","Askerler","Çiftçiler","Dokumacılar"], correct:0, hint:"Esnaf ve üreticiler ağırlıklıydı."},
+  {q:"Ahiliğin temel öğretilerinden biri aşağıdakilerden hangisidir?", a:["Sadece kar maksimize etmek","Kuran öğretmek","Mülkiyet biriktirmek","Helal kazançc ve adalet"], correct:3, hint:"Doğru ticaret ve toplumsal düzeni içerir."},
+  {q:"Ahiliğin kapısı ve sofrası nasıl olmalıdır?", a:["Kapısı kapalı, sofrası açık","Kapısı açık, sofrası kapalı","Kapısı açık, sofrası açık","Kapısı kapalı, sofrası kapalı"], correct:2, hint:"Misafire her zaman açık olmalı."},
+  {q:"Ahilik teşkilatında “eli açık olmak” neyi ifade eder?", a:["Daima harcama yapmak","Birikim yapmamak","Sadece zenginlere yardım etmek","Cömertlik ve paylaşım"], correct:3, hint:"Cömertlik temel bir değerdir."},
+  {q:"Ahiliğin temel prensiplerinden “kul hakkına riayet etmek” ne anlama gelir?", a:["Yalnızca vergi toplamak","Başkasının malına saygı göstermek","Kul hakkına girmek","İşini gizli tutmak"], correct:1, hint:"Başkalarının hakkını gözetmek gerekir."},
+  {q:"Ahilik prensiplerinden “tevazu” ne şekilde tanımlanır?", a:["Kendini büyük görmek","Sabırlı olmak","Herkesten üstün olmak","ALçakgönüllülük"], correct:3, hint:"Alçak gönüllülük olumlu bir değerdir."},
+  {q:"Ustalık mertebesine geçebilmek için hangi şart genellikle gereklidir?", a:["Sadece sözlü sözleşme","Ustalık sınavı + kalfalık dönemi","Askerlik hizmeti","Ahi evranla görüşmesi"], correct:1, hint:"Kalfalık dönemi başarıyla tamamlanmalıdır."},
+  {q:"Ahiliğin kökeninde hangi tasavvufi teşkilattan etkiler vardır?", a:["Nakşibendi","Mevlevi","Fütüvvet","Bektaşi"], correct:2, hint:"Fütüvvetnameler bu etkiden doğmuştur."},
+  {q:"Ahilik sisteminde “yemin töreni” sırasında ne tür bir ahit edilir?", a:["Sadece ticari kâr sözü","Ahlaki kurallara uyma ve esnaf kardeşliği","Askeri disipline girme","Devlet hizmetine geçme"], correct:1, hint:"Ahlaki ve toplumsal kurallara bağlılık."},
+  {q:"Ahiler için “sözünde durmak” ilkesinin anlamı nedir?", a:["Hiç konuşmamak","yalan söylememek","Sadece güçlüyle konuşmak","Verdiğin sözü yerine getirmek"], correct:3, hint:"Söz vermek ve tutmak önemlidir."},
+  {q:"Ahiler için “sabır ehliliği” neyi temsil eder?", a:["Hiç çalışmamak","kibirli olmamak","Zorluklara göğüs germek ve azimle çalışmak","Hemen zengin olmak"], correct:2, hint:"Çalışmada azim ve direnç."},
+  {q:"Ahiliğe göre bir esnafın ahlaklı olması için ne yapması gerekir?", a:["Sadece kar düşünmesi","Müşteriye güven vermesi, dürüst ticaret yapması","Ürün gizlemesi","Rakiplerini yok sayması"], correct:1, hint:"Dürüstlük temel ilkedir."},
+  {q:"Ahilik sisteminde “komşularına iyilik yapmak” ilkesinin önemi nedir?", a:["Sadece zengin komşulara yardım etmek","Toplumsal dayanışma ve birlik ruhu oluşturmak","Komşuları gözetlemek","Komşulara vergiyi artırmak"], correct:1, hint:"Toplum içinde yardımlaşma esastır."},
+  {q:"Ahilikte “dedikoduyu terk etmek” ne anlama gelir?", a:["Başkaları hakkında konuşmamak veya kötü konuşmamak","Sadece bildiklerini konuşmak","Gizli toplantılar yapmak","Başkalarının işine karışmak"], correct:0, hint:"Dedikodudan uzak durmak önemlidir."},
+  {q:"Ahiliğin ekonomik fonksiyonu neydi?", a:["Sadece fakirleri korumak","Esnaf çıkarlarını gözetmek","Askeri finansman sağlamak","Toplumsal düzeni koruyarak esnaf birliğini sağlamak"], correct:3, hint:"Ekonomi + toplumsal düzen bir arada."},
+  {q:"Ahiliğin kurucusu Ahi Evran’ın mesleği neydi?", a:["Dericilik (debbağlık)","Marangozluk","Dokumacılık","Çiftçilik"], correct:0, hint:"Dericilikten gelen bir meslek grubudur."},
+  {q:"Ahi Evran’ın türbesi hangi şehirde yer alır?", a:["İstanbul","Kayseri","Kırşehir","Konya"], correct:2, hint:"Anadolu Selçuklu etkisi olan bir şehir."},
+  {q:"Ahiler “üç şeyi açık tutmalı” ilkesine göre neleri açık tutarlardı?", a:["Kapı, dil ve gözü","Eli, kapısı ve sofrası","Beli, sofrası ve gözü","Eli, beli ve dili"], correct:1, hint:"Misafire her zaman açık olmalıdır."},
+  {q:"Ahilik teşkilatında “ilime ehemmiyet vermek” ilkesi ne demektir?", a:["Sadece para önemli","Sadece iş yapmak","Sadece dini bilgi öğrenmek","Sürekli öğrenmek ve bilgiye saygı duymak"], correct:3, hint:"Bilgi ve öğrenmeye önem verilir."},
+  {q:"Ahilik nizamnamesine göre hangi davranış hoş karşılanmaz?", a:["Yardımlaşmak","Tevazu","Sabırlı olmak","Yalan söylemek"], correct:3, hint:"Yalan söylemek yasaktır."},
+  {q:"Ahiler için “güler yüzlü olma” neden önemlidir?", a:["Müşteri çekmek için","Sosyal ve ahlaki ilişkiyi güçlendirmek","Politik güç kazanmak için","Rakipleri korkutmak için"], correct:1, hint:"Toplumsal ilişkilerde olumlu etkisi vardır."},
+  {q:"Ahiliğin sosyal fonksiyonu nedir?", a:["Sadece esnafı denetlemek","Fakirlere yardım etmek ve toplumun güvenliğini sağlamak","Askeri yapı kurmak","Saltanat kazanmak"], correct:1, hint:"Toplum yararına çalışmak esastır."},
+  {q:"Ahilikte “kul hakkı” kavramı nasıl uygulanır?", a:["Sadece esnaflar arasında","Herkesin birbirine hakkı olması ve korunması","Zenginlerin hakları önemli değildir","Yalnızca devlete karşı"], correct:1, hint:"Hakkın herkes için geçerli olması."},
+  {q:"Ahilik fütüvvetnamelerinde yaklaşık kaç kural vardır?", a:["103","260","740","855"], correct:2, hint:"Kaynaklarda 700’ü aşan kurallar geçer."},
+  {q:"Ahilikte “sabırlı olma” ilkesiyle bağlantılı değer hangisidir?", a:["Hız","Acelecilik","Dayanıklılık ve metanet","Korkaklık"], correct:2, hint:"Zorluklara göğüs germek."},
+  {q:"Ahilik sisteminde “ihanet etmemek” ne anlama gelir?", a:["Aynı meslekten olanlara ihanet etmemek","Başkasının malına ya da sözüne sadık kalmak","Sadece devlete ihanet etmemek","Rakip esnafa ihanet etmek"], correct:1, hint:"Söz ve mal güvenliği önemlidir."},
+  {q:"Ahilik değerlerinden “tevazu” ve “cömertlik” arasında nasıl bir ilişki vardır?", a:["Tevazu, cömertliğin tersi","Tevazu, cömertlikle desteklenir ve dengelenir","Tevazu, cömertliği gereksiz kılar","Aralarında hiçbir bağlantı yoktur"], correct:1, hint:"Alçakgönüllülük cömertliği güçlendirir."},
+  {q:"Ahi Evran’ın önderliğindeki Ahilik teşkilatının en önemli merkezi neresidir?", a:["İstanbul","Konya","Kırşehir","Kayseri"], correct:2, hint:"Anadolu Selçuklu şehirlerinden biri."},
+  {q:"Ahilik sisteminde “beline sahip olmak” ilkesi ne demektir?", a:["Fiziksel görünümüne dikkat etmek","Dil, el ve gözü kontrol etmek","Zengin olmak","Sadece iş kurmak"], correct:1, hint:"Ahlaki ve ahlaki davranış kontrolü."},
+  {q:"Ahilik teşkilatında “insanların ayıp ve kusurlarını örtmek” değeri neden öne çıkar?", a:["Başkalarının hatalarını açığa çıkarmak","İnsanlar arasındaki güveni ve kardeşliği korumak","Yalanı teşvik etmek","Sadece zenginlerle dost olmak"], correct:1, hint:"Toplumda güven ve kardeşliği güçlendirir."},
+  {q:"Ahilik sisteminde “öfkeye hâkim olma” ilkesi neden önemlidir?", a:["Fiziksel güç için","Sağlam karakter ve iş yaşamı düzeni için","Kaybetmemek için","Savaş stratejisi için"], correct:1, hint:"Karakter ve iş disiplinini korur."},
+  {q:"Ahilik felsefesinde “herkesin mesleği olmalı” düşüncesi neyi vurgular?", a:["Sadece soyluların meslek sahibi olması","Toplumsal düzen ve üretim","Mesleği olmayanların tercih edilmemesi","Sadece ticaretin önemli olması"], correct:1, hint:"Toplumsal üretim ve düzen önemlidir."},
+  {q:"Ahilik prensiplerinden “dostluğa önem verme” neyi ifade eder?", a:["Sadece esnaflarla dostluk kurmak","Toplumsal barışı ve iş birliğini güçlendirmek","Politik ittifak kurmak","Sadece zenginlerle iş yapmak"], correct:1, hint:"Barış ve iş birliği öne çıkar."},
+  {q:"Ahilik sisteminde “kul hakkına riayet etmek” ve “emanete ihanet etmemek” değerleri niçin birbirine yakındır?", a:["İkisi aynı anlama gelir","Biri ticari, diğeri sosyal haktır","Emanet, kul hakkının bir formudur","Hiç alakaları yoktur"], correct:2, hint:"Emanet kul hakkının bir parçasıdır."},
+  {q:"Ahilik teşkilatında çıraklık dönemi sona erdiğinde hangi törensel uygulama yapılır?", a:["Askerliğe alınma","Ustalık peştemali bağlama","Vergi indirimi","Lonca başkanlığı verilmesi"], correct:1, hint:"Ustalık dönemi resmi törenle başlar."},
+  {q:"Ahilik sisteminde “iyilik yapıp karşılık beklememek” ilkesi neyi vurgular?", a:["Her iyilikten maddi kazanç sağlamak","Sadece güçlüye yardım etmek","İyilikte samimiyet ve fedakârlık","Sır saklamayı teşvik etmek"], correct:2, hint:"Samimiyet esas alınır."},
+  {q:"Ahilikte “kul hakkı gözetmek” sadece maddi hakları mı kapsar?", a:["Evet, yalnızca mal hakkı","Hayır, manevi ve sosyal hakları da kapsar","Evet, ama yoksullara değil","Hayır, sadece devlet ile ilgilidir"], correct:1, hint:"Maddi ve manevi haklar eşit önemlidir."},
+  {q:"Ahilik sisteminin Osmanlı dönemindeki işlevi neydi?", a:["Sadece bir dini tarikat","Esnaf loncalarının, ticari düzenin ve ahlaki kaynağın temeli","Asker alma birimi","Bir ekonomik sömürü aracı"], correct:1, hint:"Ekonomi ve ahlak birlikte yürütülürdü."},
+  {q:"Ahilik teşkilatında “görgü kuralları” neden önemlidir?", a:["Sadece misafirlik için","Toplumda saygınlık ve düzen yaratmak","Yalnızca zenginler için","Yalnızca dini törenlerde uygulanmak için"], correct:1, hint:"Toplumsal saygınlık için gerekli."},
+  {q:"Ahilik sisteminde “ilahî rızayı gözeterek çalışmak” ne anlama gelir?", a:["Sadece dünyevi kazancı düşünmek","Çalışırken manevi değerleri göz önünde bulundurmak","İşle gizli ibadet yapmak","Sadece büyük işlerle meşgul olmak"], correct:1, hint:"Manevi değerleri gözetmek önemlidir."},
+  {q:"Ahilik teşkilatında “gönlünü açık tutmak” ilkesi neyi temsil eder?", a:["Kapı ve sofra açık olmalı","Yardımseverlik ve insanlara karşı açıklık","Herkese iş vermek","Gizliliği reddetmek"], correct:1, hint:"Yardımseverlik ve açıklık esas alınır."},
+  {q:"Ahilik felsefesinde “nefsi terbiye etmek” neden önemlidir?", a:["Sadece ticarette avantaj sağlamak","Hem toplumsal barışı hem bireysel ahlakı korumak","Zengin olmak için","Politika yapmak için"], correct:1, hint:"Toplum ve birey ahlakını korur."},
+  {q:"Ahilik sisteminin günümüzdeki modern bir yansıması aşağıdakilerden hangisi olabilir?", a:["Tamamen askeri loncalar","Esnaf odaları ve meslek birlikleri","Gizli tarikatlar","Sadece ticari şirketler"], correct:1, hint:"Mesleki birliklerin güncel karşılığıdır."},
+  {q:"Ahilik teşkilatının Anadolu’ya sistemli şekilde yerleşmesini sağlayan kişi kimdir?",a:["Hacı Bektaş-ı Veli","Ahi Evran","Şeyh Edebali","Ahi Şerafettin"],correct:1,hint:"Debbağların piri olarak bilinir."},
+  {q:"Ahilikte çıraklıktan kalfalığa geçişte kullanılan törenin adı nedir?",a:["Şed Kuşanma","Nasip Alma","Hil'at Giyme","Yol Bağlama"],correct:0,hint:"En sembolik tören."},
+  {q:"Ahilikte işyeri açma hakkı hangi aşamada kazanılır?",a:["Yamaklık","Çıraklık","Kalfalık","Ustalık"],correct:3,hint:"Ahîlikte en yetkin aşama."},
+  {q:"Aşağıdakilerden hangisi Ahilikte esnafın uyması gereken temel kurallardan biri değildir?",a:["Müşteriyi aldatmamak","Malı fahiş fiyatla satmak","Kaliteyi korumak","Mesleki sırları saklamak"],correct:1,hint:"Ahlaki olmayan davranış."},
+  {q:"Ahilik teşkilatının kökenleri hangi Türk devletine kadar uzanır?",a:["Göktürkler","Selçuklular","Uygurlar","Karahanlılar"],correct:3,hint:"İlk Müslüman Türk devleti."},
+  {q:"Ahi teşkilatında usta olabilmek için zorunlu görülen 'sehpa kurma' geleneği hangi törenin bir parçasıdır?",a:["Yol ataması","Şed kuşanma","İcazet alma","Piri kutsama"],correct:1,hint:"Ahiliğin en sembolik merasimlerinden biridir."},
+  {q:"Ahiliğin ilkelerine göre bir ahi'nin üretimde 'narh' uygulamasına uymaması hangi ilkeye aykırıdır?",a:["Helal kazanç","Ehl-i hibre denetimi","Eşit rekabet","Ortak emek değeri"],correct:2,hint:"Fiyat adaleti ile ilgilidir."},
+  {q:"Ahi zaviyelerinin aynı zamanda birer eğitim mekânı olmasını sağlayan unsur hangisidir?",a:["Yol fütüvvetnamesi","Açık kapı ilkesi","Meslek silsilesi","Toplumsal meşruiyet"],correct:0,hint:"Eğitim kurallarını belirleyen temel metindir."},
+  {q:"Ahilerde 'hirfet' kavramı neyi ifade eder?",a:["Meslek alanı","Esnaf grubu","Ahilik yemini","Ustalık kurulu"],correct:1,hint:"Belirli bir iş kolunu temsil eder."},
+  {q:"Ahi Evran’ın debbağlık mesleğini seçmesinin nedeni hangi ilkeyle daha çok ilişkilidir?",a:["Toplumsal ihtiyaç","Askeri gereklilik","Sanatsal yönelim","Siyasi hedef"],correct:0,hint:"Günlük ihtiyaçlara yönelik bir üretimdir."},
+  {q:"Baciyan-ı Rum teşkilatının kuruluş amacı aşağıdakilerden hangisine en yakın kabul edilir?",a:["Kadınların askeri örgütlenmesi","Kadınların mesleki ve ahlaki eğitimi","Saraya personel yetiştirme","Göçebe kadınlara barınma sağlaması"],correct:1,hint:"Ahiliğin kadınlardaki karşılığıdır."},
+  {q:"Ahilikte çıraklıktan kalfalığa geçişte yapılan sınavın temel ölçütü nedir?",a:["Yaş sınırı","Aile onayı","Meslek becerisi ve ahlaki yeterlik","Vergi kaydı"],correct:2,hint:"Mesleki + ahlaki iki yönlü bir değerlendirme."},
+  {q:"Ahi teşkilatının göçebe Türkmen gruplarını yerleşik hayata uyumlu hale getirmesinde en etkili uygulaması hangisidir?",a:["Zaviye yerleşimleri","Vergi muafiyetleri","Askeri eğitim","Toprak dağıtımı"],correct:0,hint:"Misafirhane ve eğitim merkezi görevi görürdü."},
+  {q:"Ahilikte üretim kalitesinin korunması için zorunlu olan 'ehl-i hibre' kimdir?",a:["Vergi memurları","Mesleki bilirkişiler","Saray görevlileri","Taşra subaşıları"],correct:1,hint:"Denetimden sorumlu uzmanlardır."},
+  {q:"Ahi zaviyelerinin Anadolu’da şehirleşmeye katkısı hangi alan üzerinden olmuştur?",a:["Endüstriyel üretim","Ticaret yolları kontrolü","Sosyal dayanışma ve üretim","Askeri güvenlik"],correct:2,hint:"Hem sosyal hem ekonomik merkezdi."},
+  {q:"Ahi Evran’ın Horasan’dan getirdiği düşünce sistemi hangi tasavvufi gelenekten beslenir?",a:["Mevlevilik","Fütüvvet ve Yesevilik","Bektaşilik","Kadirilik"],correct:1,hint:"Fütüvvetnamelerde açıkça belirtilir."},
+  {q:"Ahilikte müşteri kandırmak hangi davranış kategorisinde değerlendirilir?",a:["Hafif kusur","Mesleki ceza","Ahlaki ihlal","Ustalık iptali"],correct:2,hint:"Doğrudan ahlak ilkesine aykırıdır."},
+  {q:"Ahilikte 'pabucu dama atmak' deyiminin kökeni hangi uygulamaya dayanır?",a:["Borç ödeyemeyen esnaf","Hile yapan ustanın cezalandırılması","Dükkan kapatma kararı","Lonca dışına çıkarma"],correct:1,hint:"Topluma ilan edilen bir cezaydı."},
+  {q:"Ahi birliklerinde üretim miktarı hangi gerekçeyle sınırlandırılmıştır?",a:["Ham madde kıtlığı","Rekabeti dengelemek ve kaliteyi korumak","Sultanın emirleri","Vergi düzenlemeleri"],correct:1,hint:"Serbest rekabet değil, kontrollü rekabet vardır."},
+  {q:"Osmanlı’da Ahilerin devlet yönetiminde etkili olduğu dönem hangi padişahla ilişkilendirilir?",a:["II. Murad","I. Bayezid","Orhan Gazi","II. Mehmed"],correct:2,hint:"İlk örgütlü şehir yapılanmalarının dönemidir."},
+  {q:"Ahi Evran’ın eserlerinde en çok vurguladığı ilke hangisidir?",a:["Dünyevi zenginlik","Devlet yönetimi","Ahlak ve meslek bütünlüğü","Askeri disiplin"],correct:2,hint:"Meslek + ahlak bir arada."},
+  {q:"Ahilikte 'orta sandığı' ne amaçla kullanılırdı?",a:["Saray ödemeleri","Vergi toplama","Esnaf yardımlaşma ve kredi sandığı","Askeri harcamalar"],correct:2,hint:"Modern karşılığı esnaf bankası gibidir."},
+  {q:"Ahi dükkanlarının önünde bulunan 'terazi' simgesi neyi temsil ederdi?",a:["Zanaat gücü","Askeri denge","Adalet ve ölçü","Siyasi birlik"],correct:2,hint:"Ticarette doğruluk ilkesine işaret eder."},
+  {q:"Ahi Evran’ın Kayseri’deki debbağlar üzerinde kurduğu teşkilatın temel amacı neydi?",a:["Saray ekonomisini güçlendirmek","Üretimi tek elde toplamak","Meslek ahlakını yerleştirmek","Göçleri durdurmak"],correct:2,hint:"Esnaf davranışını düzenleyen ilk kurumsal adımdır."},
+  {q:"Ahilerde 'yol erkanı' hangi belgeyle düzenlenirdi?",a:["Zaviye beratları","Fütüvvetname","Menzil defteri","Şer’i sicil"],correct:1,hint:"Örgütün kutsal kitabı gibidir."},
+  {q:"Ahilikte cezaların topluluk önünde verilmesinin amacı hangisidir?",a:["İbret ve toplumsal denetim","Vergi artırımı","Siyasi güç gösterisi","Askeri caydırıcılık"],correct:0,hint:"Toplumsal kontrol mekanizmasıdır."},
+  {q:"Ahi teşkilatında ustaların yeni dükkân açmasına izin veren kurul hangisidir?",a:["Ehl-i şer","Ehl-i hibre","Yiğitbaşı meclisi","Kethüda divanı"],correct:3,hint:"Loncanın idari yönetim makamıdır."},
+  {q:"Ahilikte ‘şed kuşanma’ törenindeki şed hangi anlamı taşır?",a:["Meslek vergisi","Ustalık yetkisi","Askerlik yemini","Ticari ruhsat"],correct:1,hint:"Simgesel bir kuşak takma törenidir."},
+  {q:"Ahi Evran’ın eşi Fatma Bacı hangi yapının kurucusu kabul edilir?",a:["Alperen ocağı","Baciyan-ı Rum","Ahiyan-ı Rum","Gaziyan-ı Rum"],correct:1,hint:"Kadın teşkilatıdır."},
+  {q:"Ahi zaviyelerinde misafirlerin ücretsiz ağırlanması hangi ilkeye dayanır?",a:["Cihad anlayışı","Misafirperverlik ve infak","Askeri hazırlık","Vergi muafiyeti"],correct:1,hint:"Paylaşma kültürü esastır."},
+  {q:"Ahiliğin Osmanlı devlet teşkilatına en fazla etki ettiği alan hangisidir?",a:["Askeri teşkilatlanma","Maliye örgütü","Esnaf-lonca yapılanması","Saray protokolü"],correct:2,hint:"Lonca sistemi birebir etkilenmiştir."},
+  {q:"Ahi birliklerinde fiyatların standartlaştırılmasını sağlayan uygulama hangisidir?",a:["İaşe modellemesi","Narh sistemi","Menzil düzeni","Çerçi kontrolü"],correct:1,hint:"Fiyat tavanı uygulamasıdır."},
+  {q:"Ahilikte ‘eli açık, kapısı açık, sofrası açık’ ilkesi hangi boyutu vurgular?",a:["Ticari rekabet","Toplumsal dayanışma","Askeri birliktelik","Zanaatkâr kimliği"],correct:1,hint:"Paylaşımın toplum için önemi."},
+  {q:"Ahi Evran’ın Moğol istilasına karşı şehirleri örgütlemesi hangi işlevi gösterir?",a:["Askeri komutanlık","Siyasi otorite","Sivil direniş ve esnaf örgütlenmesi","Vergi toplama"],correct:2,hint:"Şehirlerin savunmasında esnafın rolü büyüktü."},
+  {q:"Ahiliğin Batı’daki lonca sisteminden en büyük farkı nedir?",a:["Üretim kapasitesi","Ahlak ve tasavvuf temelli olması","Sadece erkeklere açık olması","Devlet güdümünde olması"],correct:1, hint:"Fütüvvet temeline dayanır."},
+  {q:"Ahi teşkilatında ‘yiğitbaşı’ hangi görevi yürütürdü?",a:["Vergi toplamak","Askeri komutanlık","Esnafın disiplin ve denetimi","Saray kararlarını iletmek"],correct:2,hint:"Kalfalar ve ustalar arasında düzeni sağlar."},
+  {q:"Ahilikte çırak seçiminde aile geçmişinin değil karakterin esas alınması hangi prensiple ilişkilidir?",a:["Toplumsal statü","Erdem ve ahlak üstünlüğü","Devlet bağlılığı","Askeri yeterlilik"],correct:1,hint:"Ahi olmak ayrıcalık değil, ahlak işidir."},
+  {q:"Osmanlı’da loncaların merkezi otoriteye bağlanması hangi padişah döneminde hız kazanmıştır?",a:["Kanuni Sultan Süleyman","I. Mahmud","II. Bayezid","III. Selim"],correct:0,hint:"Kanunname-i İhtisab’ın etkisi büyüktür."},
+  {q:"Ahilikte kusurlu mal üreten esnafa verilen en hafif ceza hangisidir?",a:["Dükkan kapatma","Topluluk önünde uyarı","Pabucu dama atma","Meslekten çıkarma"],correct:1,hint:"İlk aşamada verilen sosyal uyarıdır."},
+  {q:"Ahi örgütlerinin Anadolu’da ticaret yollarının güvenliğini artırması hangi mekanizma ile sağlanmıştır?",a:["Saray askerleri","Esnaf nöbet sistemi","Vergi indirimleri","Kervansaray müfettişleri"],correct:1,hint:"Zanaatkârların ortak nöbet düzeni vardı."},
+  {q:"Ahiliğin toplumsal düzen üzerindeki en büyük etkisi aşağıdakilerden hangisidir?",a:["Savaş gücünü artırmak","Toplumsal ahlakı ve üretim düzenini yapılandırmak","Devlet harcamalarını azaltmak","Saray kültürünü yaymak"],correct:1,hint:"Hem ekonomi hem ahlak üzerinde belirleyici oldu."}
+];
+questions.forEach(q => {
+  if(q.a.length === 2) {
+    q.type = "truefalse"; // 2 şıklı ise Doğru/Yanlış
+  } else {
+    q.type = "multiple";  // 3 veya 4 şıklı ise Çoktan Seçmeli
+  }
+});
+
+let usedQuestions = [];
+
+// Hücre Değerleri ------------------------------------------------
+const badValues=["Zulüm","Hile","Yalan","Kibir","İhanet","Rüşvet","Kıskançlık","Bozgunculuk","Açgözlülük","Dedikodu"];
+const goodValues=["Helal Kazanç","Doğruluk","Yardımlaşma","Dürüstlük","Sabır","Adalet","Tevazu","Cömertlik","Vefa","Misafirperverlik"];
+const neutralValues=["Çalışkanlık","Tecrübe","Sorumluluk","Dikkat","Saygı","Sabır","Ustalık","Özen","Güven","İyi Niyet"];
+
+let cellValues = new Array(TOTAL).fill("");
+let foxPositions=[], horsePositions=[];
+
+// Rastgele tilki & at yerleri
+while(foxPositions.length<8){let p=Math.floor(Math.random()*TOTAL);if(!foxPositions.includes(p)&&p!==0&&p!==TOTAL-1)foxPositions.push(p);}
+while(horsePositions.length<5){let p=Math.floor(Math.random()*TOTAL);if(!horsePositions.includes(p)&&!foxPositions.includes(p)&&p!==0&&p!==TOTAL-1)horsePositions.push(p);}
+
+for(let i=0;i<TOTAL;i++){
+  if(foxPositions.includes(i)){cellValues[i]={type:"fox",value:badValues[Math.floor(Math.random()*badValues.length)]};}
+  else if(horsePositions.includes(i)){cellValues[i]={type:"horse",value:goodValues[Math.floor(Math.random()*goodValues.length)]};}
+  else{cellValues[i]={type:"value",value:neutralValues[Math.floor(Math.random()*neutralValues.length)]};}
+}
+
+// DOM ------------------------------------------------------------
+const board=document.getElementById("board");
+const pieceEl=document.getElementById("piece");
+const valueDisplay=document.getElementById("valueDisplay");
+const rollBtn=document.getElementById("rollBtn");
+const diceBox=document.getElementById("dice");
+const akceEl=document.getElementById("akce");
+const moveCountEl=document.getElementById("moveCount");
+const timerBox=document.getElementById("timer");
+
+function wait(ms){return new Promise(res=>setTimeout(res,ms));}
+
+function showValueTemporary(text){
+  valueDisplay.innerHTML=text;
+  valueDisplay.classList.add("show");
+  setTimeout(()=>valueDisplay.classList.remove("show"),3000);
+}
+
+function showCellValuePopup(index){
+  valueDisplay.innerHTML=`🔎 <strong>${cellValues[index].value}</strong>`;
+  valueDisplay.classList.add("show");
+  setTimeout(()=>valueDisplay.classList.remove("show"),3000);
+}
+
+function showExplosion(good){
+  const rect=pieceEl.getBoundingClientRect();
+  const exp=document.createElement("div");
+  exp.className="explosion";
+  exp.style.left=(rect.left+rect.width/2)+"px";
+  exp.style.top=(rect.top+rect.height/2)+"px";
+  exp.style.background=good?"radial-gradient(circle,#0f0,#0a0)":"radial-gradient(circle,#f00,#a00)";
+  document.body.appendChild(exp);
+  setTimeout(()=>exp.remove(),600);
+}
+
+// --- OYUN BİTTİ POPUP FONKSİYONU (EKLENDİ) ---------------------
+function showGameOverPopup(titleText, subText){
+  // eğer zaten açıksa tekrar açma
+  if(document.getElementById('gameOverOverlay')) return;
+
+  // oyun girişi kapat
+  gameOver = true;
+  canRoll = false;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'gameOverOverlay';
+  overlay.className = 'gameOverOverlay';
+
+  const box = document.createElement('div');
+  box.className = 'gameOverBox';
+  box.innerHTML = `
+    <h2>${titleText}</h2>
+    <p>${subText || ''}</p>
+    <div class="btns">
+      <button class="btn-restart" id="gom-restart">Yeniden Başlat</button>
+      <button class="btn-menu" id="gom-menu">Ana Menüye Dön</button>
+    </div>
+  `;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // Butonlar
+  document.getElementById('gom-restart').onclick = () => {
+    // Taşı başa al
+    piecePos = 0;
+    moveCount = 0;
+    stepCounter = 0;
+    totalSeconds = 150;
+    gameOver = false;
+    canRoll = true;
+
+    // Tahtayı tekrar çiz
+    buildBoard();
+
+    // Move/akçe bilgilerini sıfırla
+    moveCountEl.textContent = moveCount;
+    akceEl.textContent = playerAkce;
+
+    // Timer'ı güncelle
+    updateTimer();
+
+    // Popup'ı kaldır
+    document.getElementById('gameOverOverlay').remove();
+  };
+
+  document.getElementById('gom-menu').onclick = ()=> {
+    // index.html'e yönlendir
+    window.location.href = 'index.html';
+  };
+}
+
+// ----------------------------------------------------------------
+
+// Soru Penceresi ------------------------------------------------
+async function askQuestionPopup(){
+  return new Promise(res => {
+
+    canRoll=false;
+
+    if(questions.length===0){
+      questions=usedQuestions; usedQuestions=[];
+    }
+    const idx=Math.floor(Math.random()*questions.length);
+    const q=questions[idx];
+
+    const pop=document.createElement("div");
+    pop.className="questionPopup";
+    pop.innerHTML=`
+      <p style='font-weight:700;'>${q.q}</p>
+      <div id='hintBox' style='margin-bottom:8px;cursor:pointer;color:#00a;'>İpucu (10 akçe)</div>
+      ${q.a.map((t,i)=>`<button data-i='${i}'>${t}</button>`).join("")}
+    `;
+
+    document.body.appendChild(pop);
+
+    pop.querySelector("#hintBox").onclick=()=>{
+      if(playerAkce>=10){
+        playerAkce-=10; akceEl.textContent=playerAkce;
+        pop.querySelector("#hintBox").innerHTML="İpucu: "+q.hint;
+      }
+    };
+
+    pop.querySelectorAll("button[data-i]").forEach(btn=>{
+      btn.onclick=()=>{
+        const ok = Number(btn.dataset.i)===q.correct;
+        pop.remove();
+
+        usedQuestions.push(q);
+        questions.splice(idx,1);
+
+        canRoll=true;
+
+        res(ok);
+      };
+    });
+  });
+}
+
+// Tahta kurulumu ------------------------------------------------
+function buildBoard(){
+  board.innerHTML=""; positions=[]; cells=[];
+  const bw=board.clientWidth, bh=board.clientHeight;
+  const cellW=bw/COLS, cellH=bh/ROWS;
+  for(let r=ROWS-1;r>=0;r--){
+    if((ROWS-1-r)%2===0){
+      for(let c=0;c<COLS;c++) positions.push({x:c*cellW,y:r*cellH,w:cellW,h:cellH});
+    } else {
+      for(let c=COLS-1;c>=0;c--) positions.push({x:c*cellW,y:r*cellH,w:cellW,h:cellH});
+    }
+  }
+
+  for(let i=0;i<positions.length;i++){
+    const p=positions[i];
+    const div=document.createElement("div");
+    div.className="cell";
+    div.style.width=p.w+"px";
+    div.style.height=p.h+"px";
+    div.style.left=p.x+"px";
+    div.style.top=p.y+"px";
+    board.appendChild(div);
+    cells.push(div);
+
+    if(cellValues[i].type==="fox"||cellValues[i].type==="horse"){
+      const icon=document.createElement("div");
+      icon.className="cellIcon";
+      icon.textContent=cellValues[i].type==="fox"?"🦊":"🐎";
+      icon.style.fontSize=Math.min(p.w,p.h)*0.5+"px";
+      div.appendChild(icon);
+    }
+  }
+  placePiece();
+}
+
+function placePiece(){
+  if(!cells.length) return;
+  const cell = cells[piecePos];
+  if(cell) cell.appendChild(pieceEl);
+}
+
+// Timer -------------------------------------------------------
+function updateTimer(){
+  if(gameOver) return;
+  let m=Math.floor(totalSeconds/60), s=totalSeconds%60;
+  timerBox.textContent=`${m<10?"0":""}${m}:${s<10?"0":""}${s}`;
+  if(totalSeconds<=0){
+    gameOver=true;
+    canRoll=false;
+    // eskiden showValueTemporary kullanılıyordu; şimdi kalıcı GameOver popup açılıyor
+    showGameOverPopup('❌ Süre doldu!','Süreniz bitti.');
+  }
+  totalSeconds--;
+}
+setInterval(updateTimer,1000);
+
+// Hareket -----------------------------------------------------
+let stepCounter=0;
+
+async function movePiece(steps){
+  if(gameOver) return;
+
+  const start = piecePos;
+
+  for(let i=0;i<steps;i++){
+    piecePos++;
+
+   if(piecePos >= TOTAL){
+    piecePos = TOTAL - 1;
+    gameOver = true;
+
+    // skor/XP davranışı korunuyor
+    addXP(10);
+
+    // kalıcı popup göster
+    showGameOverPopup('🏆 OYUNU KAZANDIN!', '+10 XP');
+
+    // Sandık açma fonksiyonunu çağırıyoruz
+    showChest();
+// Sandığı görünür yap
+document.getElementById("chest").style.display = "block";
+
+    return;
+}
+
+
+    stepCounter++;
+    placePiece();
+    await wait(160);
+
+    if(stepCounter % 8 === 0){
+      const correct = await askQuestionPopup();
+      showExplosion(correct);
+      if(!correct){
+        totalSeconds = Math.max(0, totalSeconds - 10);
+
+        while(piecePos > start){
+          piecePos--;
+          placePiece();
+          await wait(120);
+        }
+        return;
+      }
+    }
+  }
+
+  moveCount += steps;
+  moveCountEl.textContent = moveCount;
+
+  const info = cellValues[piecePos];
+
+  if(info.type==="fox"){
+    showExplosion(false);
+    showValueTemporary("🦊 Tilki! 3 geri!");
+    piecePos=Math.max(0,piecePos-3);
+    placePiece();
+  }
+  else if(info.type==="horse"){
+    showExplosion(true);
+    showValueTemporary("🐴 At! 3 ileri!");
+    piecePos=Math.min(cells.length-1,piecePos+3);
+    placePiece();
+  }
+
+  showCellValuePopup(piecePos);
+
+  if(piecePos===cells.length-1){
+    gameOver=true;
+
+    addXP(10);
+
+    // kalıcı popup göster
+    showGameOverPopup('🏆 OYUNU KAZANDIN!','+10 XP');
+   // Sandık açma fonksiyonunu çağırıyoruz
+    showChest();   
+  }
+}
+
+// Zar atma ---------------------------------------------------
+rollBtn.onclick = async function(){
+  if(!canRoll) return;
+  if(document.querySelector(".questionPopup")) return;
+
+  canRoll = false;
+
+  let val = Math.floor(Math.random()*6)+1; // normal zar
+
+  // Meslek etkileri
+  if(selectedJob === "Demirci" && firstRoll){
+    val = 6; // ilk zar 6
+    firstRoll = false; // sadece bir kere çalışacak
+  }
+  if(selectedJob === "Marangoz"){
+    val += 1; // her hamlede +1
+  }
+
+  diceBox.textContent = val;
+  diceBox.classList.add("rollAnim");
+  setTimeout(()=>diceBox.classList.remove("rollAnim"), 800);
+
+  await movePiece(val);
+
+  setTimeout(()=>{
+    if(!document.querySelector(".questionPopup")) canRoll = true;
+  }, 4000);
+
+  moveCount++; // hamle sayısını arttır
+};
+
+
+// Başlangıç ---------------------------------------------------
+document.getElementById("infoOkBtn").onclick=()=>{
+  document.getElementById("infoPopup").remove();
+  canRoll=true;
+};
+
+buildBoard();
+updateXPBar();   
+                 
+// SAYFA YÜKLENDİĞİNDE XP'Yİ AL -------------------
+if(localStorage.getItem("totalXP")){
+  totalXP = parseInt(localStorage.getItem("totalXP"));
+} else {
+  totalXP = 0;
+}
+level = 0; // başlangıç her zaman Yamaklık
+updateXPBar();
+
+// XP EKLENDİĞİNDE KAYDET -----------------------
+function addXP(amount){
+  totalXP += amount;
+  localStorage.setItem("totalXP", totalXP); // buraya ekledik
+
+  let newLevel = Math.floor(totalXP / XP_PER_LEVEL);
+  if(newLevel > level && newLevel < levelNames.length){
+    level = newLevel;
+  }
+  updateXPBar();
+}
+
+// İstersen oyuncu sıfırlamak isterse XP'yi de temizleyebilirsin
+function resetXP(){
+  totalXP = 0;
+  level = 0;
+  localStorage.removeItem("totalXP");
+  updateXPBar();
+}
+ const spPlusTwo = document.getElementById("spPlusTwo");
+const spPlusTime = document.getElementById("spPlusTime");
+const spAutoAnswer = document.getElementById("spAutoAnswer");
+const spMinFour = document.getElementById("spMinFour");
+
+// +2 İlerleme
+spPlusTwo.onclick = async () => {
+  if(playerAkce >= 10 && canRoll){
+    playerAkce -= 10; 
+    akceEl.textContent = playerAkce;
+    await movePiece(2);
+  }
+};
+
+// +10 Saniye
+spPlusTime.onclick = () => {
+  if(playerAkce >= 10){
+    playerAkce -= 10;
+    akceEl.textContent = playerAkce;
+    totalSeconds += 10;
+    updateTimer();
+  }
+};
+
+// Oto Cevap (soru çıkarsa doğru yanıt verir)
+spAutoAnswer.onclick = () => {
+  if(playerAkce >= 10){
+    playerAkce -= 10;
+    akceEl.textContent = playerAkce;
+    if(document.querySelector(".questionPopup")){
+      document.querySelector(".questionPopup button[data-i='"+questions[0].correct+"']").click();
+    }
+  }
+};
+
+// Min 4 Zar (zar sonucu 4'ten azsa 4 yap)
+spMinFour.onclick = () => {
+  if(playerAkce >= 10){
+    playerAkce -= 10;
+    akceEl.textContent = playerAkce;
+    let val = Math.floor(Math.random()*6)+1;
+    if(val < 4) val = 4;
+    diceBox.textContent = val;
+    movePiece(val);
+  }
+};
+
+function showChest() {
+    const chest = document.getElementById("chest");
+    chest.style.display = "block"; // Sandığı görünür yap
+}
+function showChest() {
+    const chestReward = Math.floor(Math.random() * 16); // 0-15 arası akçe
+    playerAkce += chestReward; // mevcut akçeye ekle
+    alert("Sandığı açtın! 🎉 Kazandığın Akçe: " + chestReward);
+}
+// Sandık açma fonksiyonu
+function openChest() {
+    const chest = document.getElementById("chest");
+    const rewardDisplay = document.getElementById("reward");
+
+    chest.classList.add("open");
+
+    // 0-15 arası akçe üret
+    let reward = Math.floor(Math.random() * 16);
+
+    // Oyuncunun akçesine ekle
+    playerAkce += reward;
+
+    // Parçacık efektleri
+    for (let i = 0; i < 20; i++) {
+        let p = document.createElement("div");
+        p.classList.add("particle");
+        p.style.left = (110 + (Math.random() * 40 - 20)) + "px";
+        p.style.top = "70px";
+        p.style.animationDelay = (Math.random() * 0.3) + "s";
+        document.body.appendChild(p);
+
+        setTimeout(() => p.remove(), 1200);
+    }
+
+    // Ödülü göster
+    rewardDisplay.innerHTML = "🎉 Kazandığın Akçe: <b>" + reward + "</b>";
+
+    // Sandık 1.2 saniye sonra kapanır
+    setTimeout(() => {
+        chest.classList.remove("open");
+        rewardDisplay.innerHTML = "";
+        // Oyun bitti menü popup'ı göster
+        showGameOverPopup('🏆 OYUNU KAZANDIN!','+10 XP');
+    }, 1200);
+}
+ // Popup açma/kapatma
+const miniGameBtn = document.getElementById("miniGameBtn");
+const miniGamePopup = document.getElementById("miniGamePopup");
+const closePopup = document.getElementById("closePopup");
+
+miniGameBtn.onclick = () => miniGamePopup.style.display = "block";
+closePopup.onclick = () => miniGamePopup.style.display = "none";
+window.onclick = (e) => { if(e.target == miniGamePopup) miniGamePopup.style.display = "none"; }
+
+// Kartlara tıklanınca sayfaları açma
+const cards = document.querySelectorAll(".card");
+cards.forEach(card => {
+  card.onclick = () => {
+    const link = card.getAttribute("data-link");
+    window.location.href = link; // Aynı klasördeki HTML sayfasına yönlendirir
+  }
+});
+// --- Kalıcı Pause Tuşu ---
+function createPauseButton() {
+    if (document.getElementById("pauseBtn")) return;
+
+    const btn = document.createElement("button");
+    btn.id = "pauseBtn";
+    btn.innerText = "II";
+
+    btn.style.position = "fixed";
+    btn.style.top = "20px";
+    btn.style.right = "20px";
+    btn.style.padding = "12px 18px";
+    btn.style.background = "rgba(0,0,0,0.8)";
+    btn.style.color = "white";
+    btn.style.border = "none";
+    btn.style.borderRadius = "10px";
+    btn.style.fontSize = "24px";
+    btn.style.zIndex = "999999999";
+    btn.style.cursor = "pointer";
+
+    document.body.appendChild(btn);
+
+    btn.onclick = () => {
+        document.getElementById("pauseScreen").style.display = "flex";
+    };
+}
+
+// --- Kalıcı Pause Ekranı ---
+function createPauseScreen() {
+    if (document.getElementById("pauseScreen")) return;
+
+    const div = document.createElement("div");
+    div.id = "pauseScreen";
+
+    div.style.position = "fixed";
+    div.style.top = "0";
+    div.style.left = "0";
+    div.style.width = "100%";
+    div.style.height = "100%";
+    div.style.background = "rgba(0,0,0,0.7)";
+    div.style.display = "none";
+    div.style.justifyContent = "center";
+    div.style.alignItems = "center";
+    div.style.zIndex = "999999998";
+
+    div.innerHTML = `
+        <div style="background:#222;padding:30px;border-radius:15px;text-align:center;color:white;min-width:250px;">
+            <h2>Oyun Duraklatıldı</h2>
+            <button id="resumeBtn">Devam Et</button><br><br>
+            <button id="restartBtn">Yeniden Başlat</button><br><br>
+            <button id="menuBtn">Ana Menü</button>
+        </div>
+    `;
+
+    document.body.appendChild(div);
+
+    document.getElementById("resumeBtn").onclick = () => {
+        div.style.display = "none";
+    };
+    document.getElementById("restartBtn").onclick = () => {
+        window.location.href = "oyun.html";
+    };
+    document.getElementById("menuBtn").onclick = () => {
+        window.location.href = "index.html";
+    };
+}
+
+// Her 300ms'de bir buton & ekran var mı diye kontrol et → yoksa yeniden oluştur
+setInterval(() => {
+    createPauseButton();
+    createPauseScreen();
+}, 300);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Ses Ayarları</title>
+<style>
+  body {
+    margin: 0;
+    background: url('https://www.peramuzesi.org.tr/Repo/StaticContent/Images/muzik3.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .panel {
+    background: rgba(75,46,25,0.86);
+    padding: 30px;
+    border-radius: 16px;
+    width: 380px;
+    border: 4px solid #d4af37;
+    box-shadow: 0 0 18px rgba(212,175,55,0.4);
+  }
+  h2 { text-align: center; margin-bottom: 25px; color: #ffd875; }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .row span { font-size: 16px; }
+  .icon { font-size: 18px; margin-right: 6px; }
+  input[type=range] { width: 140px; }
+  .toggle {
+    background: #8b5a32;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid #d4af37;
+    color: #fff;
+    margin-left: 10px;
+    white-space: nowrap;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 25px;
+    background: #a0783c;
+    border: 2px solid #d4af37;
+    color: white;
+    font-size: 17px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="panel">
+    <h2>Ses Ayarları</h2>
+
+    <div class="row">
+      <span><span class="icon">🔊</span>Ana Ses</span>
+      <div style="display:flex; align-items:center;">
+        <input type="range" min="0" max="100" value="70">
+        <div class="toggle">🔕</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <span><span class="icon">🎵</span>Müzik</span>
+      <div style="display:flex; align-items:center;">
+        <input type="range" min="0" max="100" value="60">
+        <div class="toggle">🔕</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <span><span class="icon">💥</span>Efekt</span>
+      <div style="display:flex; align-items:center;">
+        <input type="range" min="0" max="100" value="80">
+        <div class="toggle">🔕</div>
+      </div>
+    </div>
+
+    <button id="anaMenuBtn">Ana Menüye Dön</button>
+  </div>
+
+<script>
+  // Ana Menü butonu yönlendirme
+  document.getElementById('anaMenuBtn').addEventListener('click', ()=>{
+    window.location.href = 'index.html';
+  });
+</script>
+</body>
+</html>
+

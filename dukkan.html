@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arasta</title>
+<style>
+body { margin:0; padding:0; background:#2a1e12; font-family:'Georgia', serif; color:#f8e7c3; overflow-x:hidden; }
+.header { text-align:center; font-size:48px; padding:20px; background:linear-gradient(#3d2a1a, #27190d); border-bottom:4px solid #a67c2e; text-shadow:0 0 10px #000; position:relative; }
+.back-btn { position:absolute; left:20px; top:20px; background:#a67c2e; padding:10px 18px; border-radius:10px; cursor:pointer; font-size:18px; color:#fff; border:2px solid #704f1d; }
+.category { width:95%; margin:20px auto; padding:20px; border:4px solid #a67c2e; border-radius:20px; background:#3a2818; box-shadow:0 0 20px #000; }
+.category h2 { text-align:center; margin-bottom:20px; font-size:36px; }
+.items { display:flex; justify-content:center; gap:30px; flex-wrap:wrap; }
+.item { width:260px; height:400px; background:#4b3420; border:4px solid #a67c2e; border-radius:16px; box-shadow:0 0 10px #000; display:flex; flex-direction:column; justify-content:space-between; padding:10px; transition:0.2s; }
+.item:hover { transform:scale(1.07); box-shadow:0 0 20px #000; }
+.item img { width:100%; height:220px; object-fit:contain; background:rgba(255,255,255,0.05); border-radius:10px; }
+.item-name { text-align:center; margin-top:5px; font-weight:bold; font-size:18px; }
+.btn { background:#a67c2e; padding:12px; border-radius:10px; cursor:pointer; text-align:center; border:2px solid #704f1d; font-size:20px; margin-top:5px; }
+.btn.disabled { background:#555; pointer-events:none; }
+.inventory-popup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:600px; background:#3a2818; border:4px solid #a67c2e; border-radius:20px; box-shadow:0 0 20px #000; padding:20px; display:none; z-index:999; }
+.inventory-popup h2 { text-align:center; margin-bottom:20px; }
+.close-btn { background:#000; margin-top:30px; padding:12px; text-align:center; border-radius:12px; cursor:pointer; border:2px solid #a67c2e; font-size:20px; display:block; }
+.inventory-items { display:flex; flex-direction:column; gap:10px; font-size:20px; margin-bottom:20px; }
+.open-inventory { position:fixed; right:20px; top:20px; background:#a67c2e; padding:12px 20px; border-radius:12px; border:2px solid #704f1d; cursor:pointer; font-size:20px; z-index:900; }
+.balance-box { position:fixed; left:20px; top:80px; font-size:26px; background:linear-gradient(to bottom, #f9d976, #f39f86); color:#4b2e1a; font-weight:bold; padding:10px 20px; border:3px solid #a67c2e; border-radius:12px; box-shadow:0 0 15px #000; z-index:950; text-shadow:1px 1px 2px #000; }
+.select-btn { margin-top:8px; padding:8px; border-radius:8px; border:2px solid #704f1d; background:#a67c2e; cursor:pointer; font-size:18px; text-align:center; transition:0.2s; }
+.select-btn.selected { background:#555; color:#f8e7c3; pointer-events:none; transform:scale(1.05); }
+#noMoneyPopup { position:fixed; top:40%; left:50%; transform:translate(-50%,-50%); background:#5b0000; border:4px solid #a67c2e; padding:25px 40px; border-radius:20px; box-shadow:0 0 30px #000; text-align:center; font-size:28px; display:none; z-index:2000; color:#ff4c4c; font-weight:bold; text-shadow:2px 2px 4px #000; animation:popupAnim 0.5s; }
+#firstPurchasePopup { position:fixed; top:30%; left:50%; transform:translate(-50%,-50%); background:#3a0d0d; border:4px solid #a67c2e; padding:25px 40px; border-radius:20px; box-shadow:0 0 30px #000; text-align:center; font-size:22px; display:none; z-index:2000; color:#ffd700; font-weight:bold; text-shadow:2px 2px 4px #000; animation:popupAnim 0.5s; }
+@keyframes popupAnim { 0% { transform:translate(-50%, -60%) scale(0.5); opacity:0; } 100% { transform:translate(-50%, -50%) scale(1); opacity:1; } }
+</style>
+</head>
+<body>
+<div class="header"><div class="back-btn">Geri Dön</div>Arasta</div>
+<div class="open-inventory">Depo</div>
+<div class="balance-box">Bakiye: <span id="balanceText"></span> akçe</div>
+
+<!-- Kategoriler -->
+<div class="category" id="tas">
+    <h2>Taş Görünümü</h2>
+    <div class="items">
+        <div class="item" data-name="Acemi Taşı" data-category="tas">
+            <img src="https://i.imgur.com/YWjEcKs.png" alt="Acemi Taşı">
+            <div class="item-name">Acemi Taşı</div>
+            <div class="btn" data-price="80">Satın Al (80)</div>
+        </div>
+        <div class="item" data-name="Deneyim Taşı" data-category="tas">
+            <img src="https://i.imgur.com/E9iEyZk.png" alt="Deneyim Taşı">
+            <div class="item-name">Deneyim Taşı</div>
+            <div class="btn" data-price="100">Satın Al (100)</div>
+        </div>
+        <div class="item" data-name="Usta Taşı" data-category="tas">
+            <img src="https://i.imgur.com/Zt07iVr.png" alt="Usta Taşı">
+            <div class="item-name">Usta Taşı</div>
+            <div class="btn" data-price="120">Satın Al (120)</div>
+        </div>
+    </div>
+</div>
+
+<div class="category" id="tahta">
+    <h2>Tahta Görünümü</h2>
+    <div class="items">
+        <div class="item" data-name="Lonca Tahtası" data-category="tahta">
+            <img src="https://i.imgur.com/R6vpPoC.png" alt="Lonca Tahtası">
+            <div class="item-name">Lonca Tahtası</div>
+            <div class="btn" data-price="45">Satın Al (45)</div>
+        </div>
+        <div class="item" data-name="Kardeşlik Tahtası" data-category="tahta">
+            <img src="https://i.imgur.com/c0h84vg.png" alt="Kardeşlik Tahtası">
+            <div class="item-name">Kardeşlik Tahtası</div>
+            <div class="btn" data-price="60">Satın Al (60)</div>
+        </div>
+        <div class="item" data-name="Hikmet Tahtası" data-category="tahta">
+            <img src="https://i.imgur.com/uh6EpbU.png" alt="Hikmet Tahtası">
+            <div class="item-name">Hikmet Tahtası</div>
+            <div class="btn" data-price="90">Satın Al (90)</div>
+        </div>
+    </div>
+</div>
+
+<div class="category" id="muzik">
+    <h2>Müzikler</h2>
+    <div class="items">
+        <div class="item" data-name="Zanaat Rüyası" data-category="muzik">
+            <img src="https://i.imgur.com/1xSJ89f.png" alt="Zanaat Rüyası">
+            <div class="item-name">Zanaat Rüyası</div>
+            <div class="btn" data-price="100">Satın Al (100)</div>
+        </div>
+        <div class="item" data-name="Bedesten Notaları" data-category="muzik">
+            <img src="https://i.imgur.com/1xSJ89f.png" alt="Bedesten Notaları">
+            <div class="item-name">Bedesten Notaları</div>
+            <div class="btn" data-price="150">Satın Al (150)</div>
+        </div>
+        <div class="item" data-name="Ahde Vefa" data-category="muzik">
+            <img src="https://i.imgur.com/1xSJ89f.png" alt="Ahde Vefa">
+            <div class="item-name">Ahde Vefa</div>
+            <div class="btn" data-price="220">Satın Al (220)</div>
+        </div>
+    </div>
+</div>
+
+<div id="noMoneyPopup">Yetersiz Bakiye!</div>
+<div id="firstPurchasePopup">İlk ürünü satın aldınız! Depo tuşuna tıklayarak ürünlerinizi görüntüleyebilir ve kullanıma seçebilirsiniz.</div>
+
+<div class="inventory-popup" id="inventoryPopup">
+    <h2>Depo</h2>
+    <div style="display:flex;gap:10px;margin-bottom:15px;">
+        <div class="invTab" data-tab="tas" style="padding:10px 20px;background:#a67c2e;border-radius:10px;cursor:pointer;border:2px solid #704f1d;">Taş</div>
+        <div class="invTab" data-tab="tahta" style="padding:10px 20px;background:#a67c2e;border-radius:10px;cursor:pointer;border:2px solid #704f1d;">Tahta</div>
+        <div class="invTab" data-tab="muzik" style="padding:10px 20px;background:#a67c2e;border-radius:10px;cursor:pointer;border:2px solid #704f1d;">Müzikler</div>
+    </div>
+    <div class="inventory-items" id="inventoryList"></div>
+    <div class="close-btn" id="closeInv" style="background:#000;margin-top:30px;">Kapat</div>
+</div>
+
+<script>
+let balance = parseInt(localStorage.getItem('balance')) || 500;
+const balanceText = document.getElementById('balanceText');
+balanceText.textContent = balance;
+
+let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+let firstPurchaseDone = localStorage.getItem('firstPurchaseDone') === 'true';
+
+// Müzik ürünlerini klasör dosya isimleriyle eşleştir
+const musicProducts = [
+    {name:'Zanaat Rüyası', category:'muzik', price:70, selected:true, file:'muzik1.mpeg'},
+    {name:'Bedesten Notaları', category:'muzik', price:150, selected:false, file:'muzik2.mpeg'},
+    {name:'Ahde Vefa', category:'muzik', price:220, selected:false, file:'muzik3.mpeg'}
+];
+
+// Önceden alınan ürünler varsa ekle, yoksa ilk yüklemede ekle
+musicProducts.forEach(mp=>{
+    if(!inventory.some(i=>i.name===mp.name)){
+        inventory.push(mp);
+    }
+});
+localStorage.setItem('inventory', JSON.stringify(inventory));
+
+// Önceden alınan ürünler için butonları disable et
+const buttons = document.querySelectorAll('.item .btn');
+buttons.forEach(btn => {
+    const itemEl = btn.parentElement;
+    const name = itemEl.dataset.name;
+    if (inventory.some(i => i.name === name)) {
+        btn.textContent = 'Satın Alındı';
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled','true');
+    }
+});
+
+buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const itemEl = btn.parentElement;
+        const name = itemEl.dataset.name;
+        const category = itemEl.dataset.category;
+        const price = parseInt(btn.dataset.price,10);
+
+        if(balance < price){
+            const pop = document.getElementById('noMoneyPopup');
+            pop.style.display='block';
+            setTimeout(()=>{pop.style.display='none';},1500);
+            return;
+        }
+        if(inventory.some(i => i.name === name)) return;
+
+        balance -= price;
+        balanceText.textContent = balance;
+        inventory.push({name, category, price, selected:false, file:(category==='muzik' ? (name==='Zanaat Rüyası'?'muzik1.mpeg':name==='Bedesten Notaları'?'muzik2.mpeg':'muzik3.mpeg') : '')});
+
+        localStorage.setItem('balance', balance);
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+
+        btn.textContent = 'Satın Alındı';
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled','true');
+
+        if(!firstPurchaseDone){
+            firstPurchaseDone = true;
+            localStorage.setItem('firstPurchaseDone', 'true');
+            const popup = document.getElementById('firstPurchasePopup');
+            popup.style.display='block';
+            setTimeout(()=>{popup.style.display='none';},3500);
+        }
+    });
+});
+
+const invPopup=document.getElementById('inventoryPopup');
+const invList=document.getElementById('inventoryList');
+document.querySelector('.open-inventory').onclick=()=>{loadInventoryTab('tas'); invPopup.style.display='block';};
+document.getElementById('closeInv').onclick=()=>{invPopup.style.display='none';};
+
+function loadInventoryTab(tab){
+    const filtered=inventory.filter(i=>i.category===tab);
+    invList.innerHTML=filtered.length ? filtered.map(i=>`<div>• ${i.name} — ${i.price} akçe <div class='select-btn ${i.selected?'selected':''}' data-name='${i.name}' data-cat='${i.category}'>${i.selected?'Seçildi':'Seç'}</div></div>`).join('') : '<div>Bu kategoride ürün yok.</div>';
+
+    document.querySelectorAll('.select-btn').forEach(btn=>{
+        btn.onclick=()=>{
+            const name=btn.dataset.name;
+            const cat=btn.dataset.cat;
+            inventory.filter(x=>x.category===cat).forEach(x=>x.selected=false);
+            const selItem=inventory.find(x=>x.name===name);
+            if(selItem){selItem.selected=true;}
+            document.querySelectorAll(`.select-btn[data-cat='${cat}']`).forEach(b=>{
+                const sel=inventory.find(x=>x.name===b.dataset.name);
+                b.textContent=sel.selected?'Seçildi':'Seç';
+                b.classList.toggle('selected',sel.selected);
+            });
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+        };
+    });
+}
+
+const invTabs=document.querySelectorAll('.invTab');
+invTabs.forEach(t=>{t.addEventListener('click',()=>{loadInventoryTab(t.dataset.tab);});});
+
+// -------------------- Geri Dön Butonu --------------------
+document.querySelector('.back-btn').addEventListener('click', () => {
+    window.location.href = 'index.html'; // Ana oyun sayfasının dosya adı
+});
+</script>
+</body>
+</html>
+
