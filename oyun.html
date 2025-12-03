@@ -595,8 +595,8 @@ function showGameOverPopup(titleText, subText){
   };
 
   document.getElementById('gom-menu').onclick = ()=> {
-    // index.html'e yönlendir
-    window.location.href = 'index.html';
+    // anamenu.html'e yönlendir
+    window.location.href = 'anamenu.html';
   };
 }
 
@@ -1026,7 +1026,7 @@ function createPauseScreen() {
         window.location.href = "oyun.html";
     };
     document.getElementById("menuBtn").onclick = () => {
-        window.location.href = "index.html";
+        window.location.href = "anamenu.html";
     };
 }
 
@@ -1035,6 +1035,10 @@ setInterval(() => {
     createPauseButton();
     createPauseScreen();
 }, 300);
+document.getElementById("infoOkBtn").addEventListener("click", function() {
+    const audio = new Audio("gong.wav"); // aynı klasördeki ses
+    audio.play();
+});
 
 </script>
 </body>
