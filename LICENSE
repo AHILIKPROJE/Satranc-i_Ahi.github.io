@@ -1,21 +1,20 @@
-MIT License
-
 Copyright (c) 2025 AHILIKPROJE
+Tüm Hakları Saklıdır (All Rights Reserved).
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Bu proje, AHILIKPROJE tarafından geliştirilmiş olup, tüm kodları, görselleri, dokümanları ve diğer içerikleri içerir. Bu projenin tüm hakları saklıdır ve aşağıdaki koşullar geçerlidir:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. **Kullanım Yasağı:** Bu proje, yazarın açık izni olmadan **kullanılamaz**, **çalıştırılamaz**, **kopyalanamaz**, **değiştirilemez**, **dağıtılamaz** veya **ticari amaçla kullanılamaz**.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. **İnceleme ve Eğitim Amaçları:** Projenin yalnızca **kaynak inceleme, eğitim veya araştırma amaçlı** görüntülenmesine izin verilir. Bu amaç dışında herhangi bir kullanım yasaktır.
+
+3. **Ticari Kullanım ve Çoğaltma:** Herhangi bir kişi veya kurum, projenin tamamını veya bir kısmını **ticari amaçla kullanamaz, satamaz veya dağıtamaz**. İzinsiz çoğaltma ve dağıtım hukuki sorumluluk doğurur.
+
+4. **Sorumluluk Reddi:** Projenin kullanımıyla ilgili olarak yazarlar, AHILIKPROJE veya bağlı kişiler **hiçbir şekilde doğrudan veya dolaylı sorumluluk kabul etmez**. Yazılım “olduğu gibi” sağlanır ve herhangi bir garanti verilmez.
+
+5. **İzinler ve İstisnalar:** Bu lisans, yazılı izin verilen durumlar dışında hiçbir kullanım hakkı vermez. Yazarın açık onayı olmadan yapılan her türlü işlem **yasal işlem konusu olabilir**.
+
+Bu lisans, projenin telif haklarını korumak ve izinsiz kullanımın önüne geçmek amacıyla hazırlanmıştır.
+
+
+
+For more information, please refer to <https://unlicense.org>
