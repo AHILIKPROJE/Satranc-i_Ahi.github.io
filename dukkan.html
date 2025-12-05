@@ -114,9 +114,13 @@ body { margin:0; padding:0; background:#2a1e12; font-family:'Georgia', serif; co
 </div>
 
 <script>
-let balance = parseInt(localStorage.getItem('balance')) || 500;
+let balance = parseInt(localStorage.getItem('balance')) || 10;
 const balanceText = document.getElementById('balanceText');
+
+// -------------------------- Sadece bakiyeyi 0 yap --------------------------
+balance = 0;
 balanceText.textContent = balance;
+// -----------------------------------------------------------------------
 
 let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
 let firstPurchaseDone = localStorage.getItem('firstPurchaseDone') === 'true';
@@ -220,3 +224,4 @@ document.querySelector('.back-btn').addEventListener('click', () => {
 </script>
 </body>
 </html>
+
