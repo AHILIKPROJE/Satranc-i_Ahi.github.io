@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Premium Giriş Ekranı</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    margin:0; padding:0;
+    height:100vh;
+    font-family:'Poppins', sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(135deg, #0d0d0d, #2e1a0f, #bfa03d); /* siyah → kahverengi → altın */
+    overflow:hidden;
+    opacity:0;
+    transition: opacity 1s ease;
+}
+
+body.show { opacity:1; }
+
+#loginBox {
+    background: rgba(30,20,10,0.95);
+    padding: 40px;
+    border-radius:20px;
+    width:360px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    text-align:center;
+    border: 3px solid #bfa03d;
+    transform: scale(0.8);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    opacity:0;
+}
+
+#loginBox.show {
+    transform: scale(1);
+    opacity:1;
+}
+
+h1 {
+    margin-bottom:30px;
+    font-weight:600;
+    font-size:28px;
+    color:#bfa03d;
+    text-shadow: 1px 1px 4px #000;
+}
+
+input {
+    width:100%; padding:12px; margin:10px 0;
+    border-radius:10px; border:none; outline:none;
+    font-size:16px;
+}
+
+button {
+    width:100%; padding:12px; margin:10px 0;
+    border:none; border-radius:12px;
+    font-size:16px; cursor:pointer; font-weight:600;
+    transition:0.2s;
+}
+
+#loginBtn { background:#bfa03d; color:#1a1a1a; }
+#loginBtn:hover { background:#e6c84d; }
+
+#registerBtn { background:#8b5e3c; color:white; }
+#registerBtn:hover { background:#a76f4b; }
+
+#msg { color:#ff6b6b; margin-top:10px; min-height:20px; }
+
+.fade-out {
+    opacity:0 !important;
+}
+</style>
+</head>
+<body>
+
+<div id="loginBox">
+    <h1>Hesabınıza Giriş Yapın</h1>
+    <input type="text" id="username" placeholder="Kullanıcı Adı">
+    <input type="password" id="password" placeholder="Parola">
+    <button id="loginBtn" onclick="login()">Giriş Yap</button>
+    <button id="registerBtn" onclick="register()">Kayıt Ol</button>
+    <div id="msg"></div>
+</div>
+
+<script>
+const msg = document.getElementById("msg");
+const loginBox = document.getElementById("loginBox");
+const body = document.body;
+
+// Açılış efekti
+window.addEventListener('load', () => {
+    body.classList.add('show');
+    loginBox.classList.add('show');
+});
+
+// ------------------------- KAYIT OL -------------------------
+function register(){
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    if(!user || !pass){
+        msg.style.color="#ff6b6b";
+        msg.textContent = "Boş alan bırakma!";
+        return;
+    }
+
+    if(localStorage.getItem("user_"+user)){
+        msg.style.color="#ff6b6b";
+        msg.textContent = "Bu kullanıcı zaten var!";
+        return;
+    }
+
+    const data = { password: pass, balance: 0, inventory: [] };
+    localStorage.setItem("user_"+user, JSON.stringify(data));
+    msg.style.color = "#bfa03d";
+    msg.textContent = "Kayıt başarılı! Şimdi giriş yapabilirsiniz.";
+}
+
+// ------------------------- GİRİŞ -------------------------
+function login(){
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    const saved = localStorage.getItem("user_"+user);
+    if(!saved){
+        msg.style.color="#ff6b6b";
+        msg.textContent = "Kullanıcı bulunamadı!";
+        return;
+    }
+
+    const data = JSON.parse(saved);
+    if(data.password !== pass){
+        msg.style.color="#ff6b6b";
+        msg.textContent = "Parola hatalı!";
+        return;
+    }
+
+    // Fade-out efekti → yönlendirme
+    loginBox.style.transition = "opacity 0.8s, transform 0.8s";
+    loginBox.style.opacity = "0";
+    loginBox.style.transform = "scale(0.7)";
+    body.style.transition = "opacity 0.8s";
+    body.style.opacity = "0";
+
+    setTimeout(()=> {
+        window.location.href = "anamenu.html";
+    }, 800);
+}
+</script>
+
+</body>
+</html>
+
