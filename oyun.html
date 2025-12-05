@@ -41,15 +41,27 @@ html,body{margin:0;padding:0;width:100%;height:100%;background:#22262f;display:f
   pointer-events:none;user-select:none;
   display:flex;align-items:center;justify-content:center;z-index:30;
 }
-.piece{
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  width:60px;height:60px;border-radius:50%;
-  background:radial-gradient(circle,#ffd700 0%,#ff9900 80%);
-  box-shadow:0 0 18px rgba(255,200,20,0.9), inset 0 -6px 10px rgba(0,0,0,0.15);
-  display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;
-  z-index:100;transition: transform 180ms linear;
+.piece {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; /* Görsel zaten yuvarlak, opsiyonel */
+  background-image: url('https://i.imgur.com/rslXAh7.png'); /* Senin taş görseli */
+  background-size: cover;       /* Taşın tamamını kaplasın */
+  background-position: center;
+  box-shadow: 0 0 18px rgba(255,200,20,0.9), inset 0 -6px 10px rgba(0,0,0,0.15); /* İstersen glow bırak */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #000;
+  z-index: 100;
+  transition: transform 180ms linear;
 }
+
 #valueDisplay{
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0.9);
   display:none; z-index:600; background:linear-gradient(135deg,#fff1c6,#f0d8a6);
@@ -130,6 +142,22 @@ html,body{margin:0;padding:0;width:100%;height:100%;background:#22262f;display:f
   cursor: pointer;
   transition: 0.2s;
 }
+#musicButton {
+    position: fixed;
+    top: 20px;       /* yukarıdan 20px */
+    right: 120px;    /* sağdan 120px = biraz sol */
+    background-color: #FDF5E6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 1000;
+}
+#musicButton:hover {
+    background-color: #ffa500;
+}
 
 .card:hover {
   transform: scale(1.05);
@@ -168,10 +196,10 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
 
 .questionPopup{
   position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-  background:#fff;padding:18px;border-radius:12px;z-index:700;width:360px;text-align:center;
+  background:#FDFFF5;padding:18px;border-radius:12px;z-index:700;width:360px;text-align:center;
   font-family:Arial;box-shadow:0 8px 48px rgba(0,0,0,0.6);
 }
-.questionPopup button{margin:8px;padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(120deg,#00d09c,#00b387);color:#000;font-weight:bold;cursor:pointer;}
+.questionPopup button{margin:8px;padding:8px 12px;border-radius:8px;border:none;background:linear-gradient(120deg,#00d09c,#00b387);color:#0D0EOE;font-weight:bold;cursor:pointer;}
 
 .restartBtn{
   margin-top:14px;padding:8px 14px;border:none;border-radius:8px;
@@ -180,8 +208,33 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
 
 .infoPopup{
   position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-  background:#fff;color:#000;padding:20px;border-radius:12px;z-index:800;width:400px;text-align:center;
+  background:#fff;color:#1B1813;padding:20px;border-radius:12px;z-index:800;width:400px;text-align:center;
   box-shadow:0 8px 48px rgba(0,0,0,0.6);
+}
+#bgParticles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0; /* taşların ve panelin altında */
+}
+.particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255,215,0,0.8); /* altın rengi */
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatParticle 5s linear infinite;
+}
+
+@keyframes floatParticle {
+    0% { transform: translateY(100vh) translateX(0); opacity:0; }
+    10% { opacity:1; }
+    100% { transform: translateY(-10vh) translateX(50px); opacity:0; }
 }
 
 /* --- GAME OVER POPUP --- */
@@ -203,6 +256,73 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
     display: flex;
     justify-content: center;
     margin-top: 15px;
+}
+/* Görev Butonu */
+#gorevButon {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, #e6c14e, #b28527);
+    padding: 12px 22px;
+    color: black;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 0 15px #e6c14e;
+    z-index: 9999;
+    transition: 0.2s;
+}
+
+#gorevButon:hover {
+    box-shadow: 0 0 25px #ffd563;
+}
+
+
+/* Panel */
+#gorevPanel {
+    position: fixed;
+    top: 80px;
+    left: 20px;
+    width: 280px;
+    background: rgba(10, 10, 10, 0.92);
+    border: 2px solid #e6c14e;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 25px #e6c14e;
+    backdrop-filter: blur(5px);
+    display: none;
+    z-index: 9999;
+}
+
+/* Panel Başlığı */
+.panelBaslik {
+    text-align: center;
+    font-size: 22px;
+    color: #ffd563;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px #ffd563;
+}
+
+/* Görev Kutuları */
+.gorev {
+    background: rgba(40, 40, 40, 0.8);
+    padding: 10px;
+    border-left: 4px solid #e6c14e;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.gorevAdi {
+    color: white;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.gorevDurum {
+    color: #ffd563;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 #rollBtn {
@@ -234,14 +354,42 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
 </div>
 <div id="reward"></div>
   
+<!-- Görevler Açma Butonu -->
+<div id="gorevButon">⚔️ Görevler</div>
 
+<!-- Görev Paneli -->
+<div id="gorevPanel">
+
+    <h2 class="panelBaslik">Görevler</h2>
+
+    <!-- Görev 1 -->
+    <div class="gorev">
+        <div class="gorevAdi">⏳ 5 dakika boyunca oyunda kal</div>
+        <div class="gorevDurum" id="g1durum">Bekliyor</div>
+    </div>
+
+    <!-- Görev 2 -->
+    <div class="gorev">
+        <div class="gorevAdi">🖱️ 30 kez tıkla</div>
+        <div class="gorevDurum" id="g2durum">Bekliyor</div>
+    </div>
+
+    <!-- Görev 3 -->
+    <div class="gorev">
+        <div class="gorevAdi">👣 Toplam adımda 35’e ulaş</div>
+        <div class="gorevDurum" id="g3durum">Bekliyor</div>
+    </div>
+
+</div>
+
+<div id="bgParticles"></div>
 
 <div id="container">
 
   <div id="board-frame">
     <div id="board"></div>
     <div id="valueDisplay"></div>
-    <div class="piece" id="piece">P</div>
+    <div class="piece" id="piece"></div>
   </div>
 
   <div id="controls">
@@ -263,6 +411,8 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
       </div>
 
       <div id="timer">02:30</div>
+      
+<button id="musicButton">🎵</button>
 
 <div id="superpowers">
     <button id="spPlusTwo">+2 İlerleme (10 AKÇE)</button>
@@ -304,24 +454,13 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
     * 🐴 At sizi 3 kare ileri taşır.<br>
  *Güç satın alarak ilerlemenizi kolaylaştırabilirsiniz.<br>
 *Oyun sonlarında sandık açarak akçe kazanabilirsiniz.<br>
-    * Her 8 karede bir soru çıkar.<br>
+    * Her 3 karede bir soru çıkar.<br>
     * Doğru cevap verirsen ilerler.<br>
     * Yanlış cevapta süre -10 saniye.</p>
   <button id="infoOkBtn">Anladım</button>
 </div>
-<!-- Meslek Popup -->
-<div class="jobPopup" id="jobPopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:2px solid #000; z-index:1000;">
-  <h3>Mesleğini Seç</h3>
-  <button onclick="selectJob('Marangoz')">Marangoz</button>
-  <button onclick="selectJob('Debbağ')">Debbağ</button>
-  <button onclick="selectJob('Tüccar')">Tüccar</button>
-  <button onclick="selectJob('Demirci')">Demirci</button>
-</div>
-<div id="playerJobDisplay" style="position:fixed; bottom:10px; right:10px; background:#d6a67c; padding:10px 10px; border:3px solid #000; z-index:999;">
-  Meslek: Henüz seçilmedi
-</div>
-
 <script>
+
  const jobs = {
   "Marangoz": { 
     skill: "Her hamlede +1 kare ilerler",
@@ -375,23 +514,7 @@ const TOTAL = ROWS * COLS;
 let positions = [], cells = [], piecePos = 0;
 let canRoll = false, gameOver = false, moveCount = 0;
 let totalSeconds = 150;
-// MESLEK SİSTEMİ DEĞİŞKENLERİ
-let selectedJob = null;     // Oyuncunun seçtiği meslek
-let firstRoll = false;      // Demirci için ilk zar garantisi
-
-// infoPopup'taki Anladım butonuna tıklayınca meslek popup açılır
-document.getElementById("infoOkBtn").addEventListener("click", function(){
-  document.getElementById("infoPopup").style.display = "none"; // bilgi popup kapat
-  document.getElementById("jobPopup").style.display = "block"; // meslek popup aç
-});
-
-// Meslek seçme fonksiyonu
-function selectJob(jobName){
-  playerJob = jobName; // seçilen meslek kaydedilir
-  document.getElementById("jobPopup").style.display = "none"; // popup kapat
-  document.getElementById("playerJobDisplay").textContent = "Meslek: " + jobName; // sağ alt köşede göster
-}
-
+// 
 // Sorular -------------------------------------------------------
 let questions = [
   {q:"Ahilik kelimesinin anlamı aşağıdakilerden hangisidir?", a:["İktidar sahibi","Kardeşim / eli açık","Zengin esnaf","Cömert esnaf"], correct:1, hint:"Ahilik kardeşlik ve paylaşım temelli bir sistemdir."},
@@ -480,6 +603,7 @@ let questions = [
   {q:"Ahilikte kusurlu mal üreten esnafa verilen en hafif ceza hangisidir?",a:["Dükkan kapatma","Topluluk önünde uyarı","Pabucu dama atma","Meslekten çıkarma"],correct:1,hint:"İlk aşamada verilen sosyal uyarıdır."},
   {q:"Ahi örgütlerinin Anadolu’da ticaret yollarının güvenliğini artırması hangi mekanizma ile sağlanmıştır?",a:["Saray askerleri","Esnaf nöbet sistemi","Vergi indirimleri","Kervansaray müfettişleri"],correct:1,hint:"Zanaatkârların ortak nöbet düzeni vardı."},
   {q:"Ahiliğin toplumsal düzen üzerindeki en büyük etkisi aşağıdakilerden hangisidir?",a:["Savaş gücünü artırmak","Toplumsal ahlakı ve üretim düzenini yapılandırmak","Devlet harcamalarını azaltmak","Saray kültürünü yaymak"],correct:1,hint:"Hem ekonomi hem ahlak üzerinde belirleyici oldu."}
+
 ];
 questions.forEach(q => {
   if(q.a.length === 2) {
@@ -737,7 +861,7 @@ document.getElementById("chest").style.display = "block";
     placePiece();
     await wait(160);
 
-    if(stepCounter % 8 === 0){
+    if(stepCounter % 3 === 0){
       const correct = await askQuestionPopup();
       showExplosion(correct);
       if(!correct){
@@ -755,6 +879,7 @@ document.getElementById("chest").style.display = "block";
 
   moveCount += steps;
   moveCountEl.textContent = moveCount;
+gorev3_kontrol(moveCount);
 
   const info = cellValues[piecePos];
 
@@ -794,14 +919,6 @@ rollBtn.onclick = async function(){
 
   let val = Math.floor(Math.random()*6)+1; // normal zar
 
-  // Meslek etkileri
-  if(selectedJob === "Demirci" && firstRoll){
-    val = 6; // ilk zar 6
-    firstRoll = false; // sadece bir kere çalışacak
-  }
-  if(selectedJob === "Marangoz"){
-    val += 1; // her hamlede +1
-  }
 
   diceBox.textContent = val;
   diceBox.classList.add("rollAnim");
@@ -1039,6 +1156,107 @@ document.getElementById("infoOkBtn").addEventListener("click", function() {
     const audio = new Audio("gong.wav"); // aynı klasördeki ses
     audio.play();
 });
+let music = new Audio("muzik1.mpeg");
+let isPlaying = false;
+
+document.getElementById("musicButton").addEventListener("click", function () {
+    if (!isPlaying) {
+        music.loop = true;
+        music.play();
+        isPlaying = true;
+    } else {
+        music.pause();
+        music.currentTime = 0;
+        isPlaying = false;
+    }
+});
+document.getElementById("gorevButon").onclick = () => {
+    const panel = document.getElementById("gorevPanel");
+    panel.style.display = (panel.style.display === "block") ? "none" : "block";
+};
+// ------------------------------------
+// GÖREV 1: 5 dakika oyunda kal
+// ------------------------------------
+let sureBitti = false;
+
+setTimeout(() => {
+    sureBitti = true;
+    document.getElementById("g1durum").innerText = "Tamamlandı";
+    document.getElementById("g1durum").style.color = "#00ff6a"; // yeşil renk
+}, 5 * 60 * 1000); // 5 dakika
+// ------------------------------------
+// GÖREV 2: 30 kez tıklama
+// ------------------------------------
+let g2_tiklama = 0;
+let g2_bitti = false;
+
+// Eğer tüm tıklamalar sayılsın istiyorsan:
+document.addEventListener("click", function () {
+    if (g2_bitti) return;
+
+    g2_tiklama++;
+
+    if (g2_tiklama >= 30) {
+        g2_bitti = true;
+        document.getElementById("g2durum").innerText = "Tamamlandı";
+        document.getElementById("g2durum").style.color = "#00ff6a"; // premium yeşil
+    }
+});
+// ------------------------------------
+// GÖREV 3: Toplam adım sayısı 35'e ulaş
+// ------------------------------------
+let g3_bitti = false;
+
+function gorev3_kontrol(adim) {
+    if (g3_bitti) return;
+
+    if (adim >= 35) {
+        g3_bitti = true;
+        document.getElementById("g3durum").innerText = "Tamamlandı";
+        document.getElementById("g3durum").style.color = "#00ff6a";
+    }
+}
+function createSparkle() {
+    const sparkle = document.createElement('div');
+    const size = Math.random() * 6 + 3; // 3px ile 9px arası
+    sparkle.style.position = 'absolute';
+    sparkle.style.width = size + 'px';
+    sparkle.style.height = size + 'px';
+    sparkle.style.background = '#FFD700';
+    sparkle.style.borderRadius = '50%';
+    sparkle.style.top = Math.random() * window.innerHeight + 'px';
+    sparkle.style.left = Math.random() * window.innerWidth + 'px';
+    sparkle.style.opacity = Math.random() * 0.5 + 0.5; // 0.5 - 1
+    sparkle.style.pointerEvents = 'none';
+    sparkle.style.transition = 'transform 2s linear, opacity 2s linear';
+    
+    document.body.appendChild(sparkle);
+
+    const deltaX = (Math.random() - 0.5) * 100; // -50px ile +50px
+    const deltaY = (Math.random() - 0.5) * 100;
+
+    setTimeout(() => {
+        sparkle.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        sparkle.style.opacity = 0;
+    }, 10);
+
+    setTimeout(() => { sparkle.remove(); }, 2000);
+}
+
+setInterval(createSparkle, 150);
+    function createParticles(count=30){
+    const container = document.getElementById('bgParticles');
+    for(let i=0;i<count;i++){
+        const p = document.createElement('div');
+        p.className='particle';
+        p.style.left = Math.random()*window.innerWidth+'px';
+        p.style.animationDelay = (Math.random()*5)+'s';
+        container.appendChild(p);
+    }
+}
+
+createParticles();
+                                                        
 
 </script>
 </body>
