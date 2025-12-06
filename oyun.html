@@ -163,6 +163,139 @@ html,body{margin:0;padding:0;width:100%;height:100%;background:#22262f;display:f
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
 }
+#profileBtn {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    padding: 12px 22px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #f5d48a, #b88a30);
+    color: #1a1a1a;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 9999;
+    border: none;
+    box-shadow: 0 0 12px rgba(0,0,0,0.45);
+    transition: 0.2s;
+}
+#profileBtn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 0 18px #f5d48a;
+}
+
+#overlayBG {
+    position: fixed;
+    display: none;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.65);
+    z-index: 9998;
+}
+
+#profilePanel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 520px;
+    transform: translate(-50%, -50%) scale(0.7);
+    background: linear-gradient(135deg, #120d08, #2a2015);
+    border: 3px solid #b88a30;
+    border-radius: 25px;
+    padding: 25px;
+    display: none;
+    z-index: 10000;
+    box-shadow: 0 0 35px rgba(0,0,0,0.7);
+    animation: openPanel 0.35s forwards;
+    color: #fff;
+}
+
+@keyframes openPanel {
+    from { opacity:0; transform: translate(-50%, -50%) scale(0.7); }
+    to   { opacity:1; transform: translate(-50%, -50%) scale(1); }
+}
+
+#profileHeader {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#avatarIcon {
+    width: 75px;
+    height: 75px;
+    background: #3e2e1c;
+    border-radius: 50%;
+    border: 3px solid #b88a30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
+
+#profileTexts {
+    display: flex;
+    flex-direction: column;
+}
+
+#profileName {
+    font-size: 26px;
+    font-weight: 700;
+    color: #f5d48a;
+}
+
+#profileTag {
+    font-size: 14px;
+    opacity: 0.75;
+    letter-spacing: 1px;
+}
+
+.profileTabs {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+.profileTab {
+    padding: 10px 15px;
+    background: #2d2316;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+    width: 48%;
+    text-align: center;
+}
+.profileTab:hover {
+    background: #3c2f1c;
+}
+.profileTab.active {
+    background: #f5d48a;
+    color: black;
+}
+
+.tabContent {
+    margin-top: 20px;
+    display: none;
+}
+
+.badgeLocked {
+    width: 90px;
+    height: 90px;
+    background: #251c12;
+    border: 2px solid #b88a30;
+    border-radius: 15px;
+    margin: 8px;
+    color: #f5d48a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    transition: 0.25s;
+}
+.badgeLocked:hover {
+    transform: scale(1.12);
+    background: #f5d48a;
+    color: #1a1a1a;
+}
 
 /* --- LEVEL BAR --- */
 #levelBox{
@@ -459,6 +592,42 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
     * Yanlış cevapta süre -10 saniye.</p>
   <button id="infoOkBtn">Anladım</button>
 </div>
+  <div id="overlayBG"></div>
+
+<div id="profilePanel">
+    
+    <div id="profileHeader">
+        <div id="avatarIcon">🎲</div>
+        <div id="profileTexts">
+            <div id="profileName">Kullanıcı</div>
+            <div id="profileTag">#kullanici</div>
+        </div>
+    </div>
+
+    <div class="profileTabs">
+        <div class="profileTab active" data-tab="infoTab">Bilgiler</div>
+        <div class="profileTab" data-tab="badgesTab">Rozetler</div>
+    </div>
+
+    <div id="infoTab" class="tabContent" style="display:block;">
+        <p style="opacity:0.8;">Yakında...</p>
+    </div>
+
+    <div id="badgesTab" class="tabContent">
+        <div style="display:flex; flex-wrap:wrap; justify-content:center;">
+            <div class="badgeLocked">?</div>
+            <div class="badgeLocked">?</div>
+            <div class="badgeLocked">?</div>
+            <div class="badgeLocked">?</div>
+        </div>
+        <p style="text-align:center; opacity:0.8; margin-top:10px;">
+            Seviyeni yükselterek benzersiz rozetlerin kilidini açabilirsin!
+        </p>
+    </div>
+</div>
+
+<button id="profileBtn">Profil</button>
+
 <script>
 let winSounds = [
     new Audio("zafer1.mp3"),
@@ -1440,6 +1609,32 @@ window.addEventListener("click", () => {
     }
 });
 
+const profileBtn = document.getElementById("profileBtn");
+const profilePanel = document.getElementById("profilePanel");
+const overlayBG = document.getElementById("overlayBG");
+
+profileBtn.onclick = () => {
+    overlayBG.style.display = "block";
+    profilePanel.style.display = "block";
+};
+overlayBG.onclick = () => {
+    overlayBG.style.display = "none";
+    profilePanel.style.display = "none";
+};
+
+document.querySelectorAll(".profileTab").forEach(tab => {
+    tab.addEventListener("click", () => {
+        document.querySelectorAll(".profileTab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        document.querySelectorAll(".tabContent").forEach(c => c.style.display = "none");
+        document.getElementById(tab.dataset.tab).style.display = "block";
+    });
+});
+
+let activeUser = localStorage.getItem("activeUser") || "Kullanıcı";
+document.getElementById("profileName").innerText = activeUser;
+document.getElementById("profileTag").innerText = "#" + activeUser.toLowerCase();
 
 </script>
 </body>
