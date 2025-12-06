@@ -1080,7 +1080,8 @@ cards.forEach(card => {
     window.location.href = link; // Aynı klasördeki HTML sayfasına yönlendirir
   }
 });
-// --- Kalıcı Pause Tuşu ---
+
+// --- KALICI PAUSE TUŞU ---
 function createPauseButton() {
     if (document.getElementById("pauseBtn")) return;
 
@@ -1107,7 +1108,9 @@ function createPauseButton() {
     };
 }
 
-// --- Kalıcı Pause Ekranı ---
+
+
+// --- KALICI PAUSE EKRANI ---
 function createPauseScreen() {
     if (document.getElementById("pauseScreen")) return;
 
@@ -1130,22 +1133,91 @@ function createPauseScreen() {
             <h2>Oyun Duraklatıldı</h2>
             <button id="resumeBtn">Devam Et</button><br><br>
             <button id="restartBtn">Yeniden Başlat</button><br><br>
-            <button id="menuBtn">Ana Menü</button>
+            <button id="menuBtn">Ana Menü</button><br><br>
+            <button id="settingsBtn">Ayarlar</button>
         </div>
     `;
 
     document.body.appendChild(div);
 
+    // BUTON FONKSİYONLARI
     document.getElementById("resumeBtn").onclick = () => {
         div.style.display = "none";
     };
+
     document.getElementById("restartBtn").onclick = () => {
-        window.location.href = "oyun.html";
+        location.reload(); // En güvenlisi
     };
+
     document.getElementById("menuBtn").onclick = () => {
         window.location.href = "anamenu.html";
     };
+
+    // AYARLAR AÇMA
+    document.getElementById("settingsBtn").onclick = () => {
+        createSettingsPanel();
+        document.getElementById("settingsPanel").style.display = "block";
+    };
 }
+
+
+
+// --- AYARLAR PANELİ ---
+function createSettingsPanel() {
+    if (document.getElementById("settingsPanel")) return;
+
+    const panel = document.createElement("div");
+    panel.id = "settingsPanel";
+
+    panel.style.position = "fixed";
+    panel.style.top = "50%";
+    panel.style.left = "50%";
+    panel.style.transform = "translate(-50%, -50%)";
+    panel.style.background = "#111";
+    panel.style.padding = "25px";
+    panel.style.borderRadius = "12px";
+    panel.style.textAlign = "center";
+    panel.style.minWidth = "250px";
+    panel.style.color = "white";
+    panel.style.border = "2px solid #444";
+    panel.style.zIndex = "999999999";
+    panel.style.display = "none";
+
+    panel.innerHTML = `
+        <h3>Ayarlar</h3>
+
+        <label style="font-size:18px;">
+            Ses:
+            <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="1">
+        </label>
+
+        <br><br>
+        <button id="closeSettings">Kapat</button>
+    `;
+
+    document.body.appendChild(panel);
+
+    // --- PANEL KAPATMA ---
+    document.getElementById("closeSettings").onclick = () => {
+        panel.style.display = "none";
+    };
+
+    // --- SES AYARI ---
+    const slider = document.getElementById("volumeSlider");
+    slider.oninput = () => {
+        if (typeof music !== "undefined") {
+            music.volume = slider.value;
+        }
+    };
+}
+
+
+
+// --- KONTROL: BUTONLAR VE EKRAN SİLİNİRSE TEKRAR OLUŞSUN ---
+setInterval(() => {
+    createPauseButton();
+    createPauseScreen();
+}, 300);
 
 // Her 300ms'de bir buton & ekran var mı diye kontrol et → yoksa yeniden oluştur
 setInterval(() => {
@@ -1174,6 +1246,8 @@ document.getElementById("gorevButon").onclick = () => {
     const panel = document.getElementById("gorevPanel");
     panel.style.display = (panel.style.display === "block") ? "none" : "block";
 };
+
+  
 // ------------------------------------
 // GÖREV 1: 5 dakika oyunda kal
 // ------------------------------------
