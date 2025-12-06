@@ -1382,6 +1382,34 @@ window.onload = () => {
     startMotivationSounds();
 };
 
+let soundsUnlocked = false;
+
+window.addEventListener("click", () => {
+    if (!soundsUnlocked) {
+
+        // Buraya oyunda kullandığın seslerin .play() komutlarını koy
+        ses5.play();
+        ses6.play();
+        ses7.play();
+        ses8.play();
+        ses9.play();
+        ses10.play();
+        ses11.play();
+
+        // Hemen durdur (sadece izin almak için oynattık)
+        ses5.pause();  ses5.currentTime = 0;
+        ses6.pause();  ses6.currentTime = 0;
+        ses7.pause();  ses7.currentTime = 0;
+        ses8.pause();  ses8.currentTime = 0;
+        ses9.pause();  ses9.currentTime = 0;
+        ses10.pause(); ses10.currentTime = 0;
+        ses11.pause(); ses11.currentTime = 0; // ← ***DÜZELTİLDİ***
+
+        soundsUnlocked = true;
+    }
+});
+
+
 </script>
 </body>
 </html>
