@@ -460,6 +460,26 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
   <button id="infoOkBtn">Anladım</button>
 </div>
 <script>
+let winSounds = [
+    new Audio("zafer1.mp3"),
+    new Audio("zafer2.mp3"),
+    new Audio("zafer3.mp3"),
+    new Audio("zafer4.mp3")
+];
+
+let loseSounds = [
+    new Audio("motive1.mp3"),
+    new Audio("motive2.mp3"),
+    new Audio("motive3.mp3")
+];
+
+function playWinSound(){
+    winSounds[Math.floor(Math.random() * winSounds.length)].play();
+}
+
+function playLoseSound(){
+    loseSounds[Math.floor(Math.random() * loseSounds.length)].play();
+}
 
  const jobs = {
   "Marangoz": { 
@@ -624,7 +644,7 @@ let cellValues = new Array(TOTAL).fill("");
 let foxPositions=[], horsePositions=[];
 
 // Rastgele tilki & at yerleri
-while(foxPositions.length<8){let p=Math.floor(Math.random()*TOTAL);if(!foxPositions.includes(p)&&p!==0&&p!==TOTAL-1)foxPositions.push(p);}
+while(foxPositions.length<10){let p=Math.floor(Math.random()*TOTAL);if(!foxPositions.includes(p)&&p!==0&&p!==TOTAL-1)foxPositions.push(p);}
 while(horsePositions.length<5){let p=Math.floor(Math.random()*TOTAL);if(!horsePositions.includes(p)&&!foxPositions.includes(p)&&p!==0&&p!==TOTAL-1)horsePositions.push(p);}
 
 for(let i=0;i<TOTAL;i++){
@@ -668,12 +688,19 @@ function showExplosion(good){
   setTimeout(()=>exp.remove(),600);
 }
 
-// --- OYUN BİTTİ POPUP FONKSİYONU (EKLENDİ) ---------------------
+// --- OYUN BİTTİ POPUP FONKSİYONU (SES EKLENDİ) ---------------------
 function showGameOverPopup(titleText, subText){
   // eğer zaten açıksa tekrar açma
   if(document.getElementById('gameOverOverlay')) return;
 
-  // oyun girişi kapat
+  // --- 🔊 BURADA SES ÇALIYOR ---
+  if (titleText.includes("Kazandın") || titleText.includes("Tebrik")) {
+      playWinSound();   // Zafer sesi
+  } else {
+      playLoseSound();  // Kaybetme / motive sesi
+  }
+
+  // oyun girişlerini kapat
   gameOver = true;
   canRoll = false;
 
@@ -694,7 +721,7 @@ function showGameOverPopup(titleText, subText){
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 
-  // Butonlar
+  // --- Butonlar ---
   document.getElementById('gom-restart').onclick = () => {
     // Taşı başa al
     piecePos = 0;
@@ -716,6 +743,10 @@ function showGameOverPopup(titleText, subText){
 
     // Popup'ı kaldır
     document.getElementById('gameOverOverlay').remove();
+  };
+
+  document.getElementById('gom-menu').onclick = () => {
+    window.location.href = "anamenu.html";
   };
 
   document.getElementById('gom-menu').onclick = ()=> {
