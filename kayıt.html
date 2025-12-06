@@ -2,154 +2,263 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Premium Giriş Ekranı</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+<title>Urefa Online • Giriş</title>
 
-body {
-    margin:0; padding:0;
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
     height:100vh;
-    font-family:'Poppins', sans-serif;
+    font-family:'Inter', sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
-    background: linear-gradient(135deg, #0d0d0d, #2e1a0f, #bfa03d); /* siyah → kahverengi → altın */
     overflow:hidden;
-    opacity:0;
-    transition: opacity 1s ease;
+    background: linear-gradient(135deg,#0a0a0a,#1d1208,#4b320c,#b8943d);
+    animation:bgmove 12s infinite alternate ease-in-out;
+    transition:1s;
 }
 
-body.show { opacity:1; }
+@keyframes bgmove{
+    0%{ background-position:0 0; }
+    100%{ background-position:100% 100%; }
+}
 
-#loginBox {
-    background: rgba(30,20,10,0.95);
-    padding: 40px;
-    border-radius:20px;
-    width:360px;
-    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+/* PARTİKÜL EFEKTİ */
+.particle{
+    position:absolute;
+    width:6px; height:6px;
+    background:white;
+    opacity:0.15;
+    border-radius:50%;
+    animation:floating 12s infinite linear;
+}
+@keyframes floating{
+    0%{ transform:translateY(110vh); }
+    100%{ transform:translateY(-10vh); }
+}
+
+/* Dönen ZAR EMOJİSİ */
+.logo-emoji{
+    font-size:80px;
+    animation:spin 6s infinite linear;
+    text-shadow:0 0 10px rgba(255,255,255,0.5);
+    display:block;
+    margin-bottom:10px;
+}
+
+@keyframes spin{
+    0%{ transform:rotateY(0deg); }
+    100%{ transform:rotateY(360deg); }
+}
+
+/* GLASS BOX */
+.glass-box{
+    width:400px;
+    padding:40px 50px;
+    border-radius:25px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.12);
+    box-shadow:0 0 35px rgba(0,0,0,0.85);
     text-align:center;
-    border: 3px solid #bfa03d;
-    transform: scale(0.8);
-    transition: transform 0.5s ease, opacity 0.5s ease;
     opacity:0;
+    transform:translateY(40px);
+    animation:fadeIn 1.2s forwards ease-out;
 }
 
-#loginBox.show {
-    transform: scale(1);
-    opacity:1;
+@keyframes fadeIn{
+    to{ opacity:1; transform:translateY(0); }
 }
 
-h1 {
-    margin-bottom:30px;
-    font-weight:600;
-    font-size:28px;
-    color:#bfa03d;
-    text-shadow: 1px 1px 4px #000;
+.title{
+    font-size:30px;
+    font-weight:800;
+    color:#e5c878;
+    margin-bottom:15px;
+    text-shadow:0 0 8px rgba(0,0,0,0.7);
 }
 
-input {
-    width:100%; padding:12px; margin:10px 0;
-    border-radius:10px; border:none; outline:none;
+/* INPUT */
+input{
+    width:100%;
+    padding:14px;
+    margin:12px 0;
+    border-radius:14px;
+    border:none;
     font-size:16px;
-}
-
-button {
-    width:100%; padding:12px; margin:10px 0;
-    border:none; border-radius:12px;
-    font-size:16px; cursor:pointer; font-weight:600;
+    background:rgba(255,255,255,0.14);
+    color:white;
+    outline:none;
     transition:0.2s;
 }
-
-#loginBtn { background:#bfa03d; color:#1a1a1a; }
-#loginBtn:hover { background:#e6c84d; }
-
-#registerBtn { background:#8b5e3c; color:white; }
-#registerBtn:hover { background:#a76f4b; }
-
-#msg { color:#ff6b6b; margin-top:10px; min-height:20px; }
-
-.fade-out {
-    opacity:0 !important;
+input:focus{
+    background:rgba(255,255,255,0.25);
 }
+
+/* GOLD HOVER ANİMASYON BUTONU */
+.btn{
+    width:100%;
+    padding:14px;
+    margin-top:12px;
+    border:none;
+    border-radius:14px;
+    font-size:17px;
+    font-weight:600;
+    cursor:pointer;
+    letter-spacing:0.5px;
+    position:relative;
+    overflow:hidden;
+    transition:0.3s;
+}
+
+.btn::after{
+    content:"";
+    position:absolute;
+    top:0; left:-100%;
+    width:100%; height:100%;
+    background: linear-gradient(120deg, transparent, rgba(255,230,140,0.6), transparent);
+    transition:0.35s;
+}
+
+.btn:hover::after{
+    left:100%;
+}
+
+.login-btn{ background:#e5c878; color:#1c1c1c; }
+.reg-btn{ background:#765526; color:white; }
+
+.btn:hover{ transform:translateY(-2px); }
+
+/* Tema butonu */
+.themeToggle{
+    position:absolute;
+    top:20px; right:20px;
+    padding:10px 18px;
+    border-radius:20px;
+    background:#0000005a;
+    border:1px solid #ffffff44;
+    color:white;
+    cursor:pointer;
+    backdrop-filter:blur(8px);
+    transition:0.3s;
+}
+.themeToggle:hover{
+    background:#ffffff22;
+}
+
+#msg{ margin-top:15px; min-height:22px; font-size:15px; }
 </style>
 </head>
+
 <body>
 
-<div id="loginBox">
-    <h1>Hesabınıza Giriş Yapın</h1>
+<button class="themeToggle" onclick="toggleTheme()">🌙 Tema</button>
+
+<!-- Partiküller -->
+<script>
+for(let i=0;i<35;i++){
+    let p=document.createElement("div");
+    p.className="particle";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=(10+Math.random()*10)+"s";
+    p.style.opacity = 0.05 + Math.random()*0.15;
+    document.body.appendChild(p);
+}
+</script>
+
+<div class="glass-box">
+
+    <div class="logo-emoji">🎲</div>
+
+    <div class="title">Urefa Online</div>
+
     <input type="text" id="username" placeholder="Kullanıcı Adı">
     <input type="password" id="password" placeholder="Parola">
-    <button id="loginBtn" onclick="login()">Giriş Yap</button>
-    <button id="registerBtn" onclick="register()">Kayıt Ol</button>
+
+    <button class="btn login-btn" onclick="login()">Giriş Yap</button>
+    <button class="btn reg-btn" onclick="register()">Kayıt Ol</button>
+
     <div id="msg"></div>
 </div>
 
+
 <script>
-const msg = document.getElementById("msg");
-const loginBox = document.getElementById("loginBox");
-const body = document.body;
+/* SESLER — Dosyaya ihtiyaç yok */
+let clickS = new Audio(
+"data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..."
+);
 
-// Açılış efekti
-window.addEventListener('load', () => {
-    body.classList.add('show');
-    loginBox.classList.add('show');
-});
+let loginS = new Audio(
+"data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..."
+);
 
-// ------------------------- KAYIT OL -------------------------
+/* Ses autoplay için dokunma izni */
+window.addEventListener("click",()=>{ clickS.play().catch(()=>{}); },{once:true});
+
+function hash(p){ return btoa(p); }
+
+function showMsg(t,c){ msg.style.color=c; msg.textContent=t; }
+
 function register(){
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
+    clickS.play();
 
-    if(!user || !pass){
-        msg.style.color="#ff6b6b";
-        msg.textContent = "Boş alan bırakma!";
-        return;
+    let u=username.value.trim();
+    let p=password.value.trim();
+
+    if(!u||!p){ showMsg("Boş bırakma!","red"); return; }
+
+    if(localStorage.getItem("user_"+u)){
+        showMsg("Bu kullanıcı zaten var!","red"); return;
     }
 
-    if(localStorage.getItem("user_"+user)){
-        msg.style.color="#ff6b6b";
-        msg.textContent = "Bu kullanıcı zaten var!";
-        return;
-    }
+    let data={password:hash(p), stats:{win:0,lose:0}, coins:0, inventory:[]};
+    localStorage.setItem("user_"+u, JSON.stringify(data));
 
-    const data = { password: pass, balance: 0, inventory: [] };
-    localStorage.setItem("user_"+user, JSON.stringify(data));
-    msg.style.color = "#bfa03d";
-    msg.textContent = "Kayıt başarılı! Şimdi giriş yapabilirsiniz.";
+    showMsg("Kayıt başarılı! Giriş yapabilirsin.","#e5c878");
 }
 
-// ------------------------- GİRİŞ -------------------------
 function login(){
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
+    clickS.play();
 
-    const saved = localStorage.getItem("user_"+user);
-    if(!saved){
-        msg.style.color="#ff6b6b";
-        msg.textContent = "Kullanıcı bulunamadı!";
-        return;
+    let u=username.value.trim();
+    let p=password.value.trim();
+
+    let stored=localStorage.getItem("user_"+u);
+
+    if(!stored){ showMsg("Kullanıcı bulunamadı!","red"); return; }
+
+    let data=JSON.parse(stored);
+
+    if(data.password!==hash(p)){
+        showMsg("Parola yanlış!","red"); return;
     }
 
-    const data = JSON.parse(saved);
-    if(data.password !== pass){
-        msg.style.color="#ff6b6b";
-        msg.textContent = "Parola hatalı!";
-        return;
+    loginS.play();
+    localStorage.setItem("activeUser", u);
+
+    document.body.style.opacity="0";
+
+    setTimeout(()=> window.location.href="anamenu.html", 800);
+}
+
+/* Tema değiştirici */
+let dark=true;
+function toggleTheme(){
+    clickS.play();
+
+    if(dark){
+        document.body.style.background="linear-gradient(135deg,#f8eed7,#f3d28c,#cfb05a,#8b6a3d)";
+        document.body.style.color="black";
+    }else{
+        document.body.style.background="linear-gradient(135deg,#0a0a0a,#1d1208,#4b320c,#b8943d)";
+        document.body.style.color="white";
     }
-
-    // Fade-out efekti → yönlendirme
-    loginBox.style.transition = "opacity 0.8s, transform 0.8s";
-    loginBox.style.opacity = "0";
-    loginBox.style.transform = "scale(0.7)";
-    body.style.transition = "opacity 0.8s";
-    body.style.opacity = "0";
-
-    setTimeout(()=> {
-        window.location.href = "anamenu.html";
-    }, 800);
+    dark=!dark;
 }
 </script>
 
 </body>
 </html>
-
