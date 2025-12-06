@@ -6,7 +6,6 @@
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-
 *{ margin:0; padding:0; box-sizing:border-box; }
 
 body{
@@ -26,7 +25,6 @@ body{
     100%{ background-position:100% 100%; }
 }
 
-/* PARTİKÜL EFEKTİ */
 .particle{
     position:absolute;
     width:6px; height:6px;
@@ -40,7 +38,6 @@ body{
     100%{ transform:translateY(-10vh); }
 }
 
-/* Dönen ZAR EMOJİSİ */
 .logo-emoji{
     font-size:80px;
     animation:spin 6s infinite linear;
@@ -48,13 +45,11 @@ body{
     display:block;
     margin-bottom:10px;
 }
-
 @keyframes spin{
     0%{ transform:rotateY(0deg); }
     100%{ transform:rotateY(360deg); }
 }
 
-/* GLASS BOX */
 .glass-box{
     width:400px;
     padding:40px 50px;
@@ -68,7 +63,6 @@ body{
     transform:translateY(40px);
     animation:fadeIn 1.2s forwards ease-out;
 }
-
 @keyframes fadeIn{
     to{ opacity:1; transform:translateY(0); }
 }
@@ -81,7 +75,6 @@ body{
     text-shadow:0 0 8px rgba(0,0,0,0.7);
 }
 
-/* INPUT */
 input{
     width:100%;
     padding:14px;
@@ -94,11 +87,8 @@ input{
     outline:none;
     transition:0.2s;
 }
-input:focus{
-    background:rgba(255,255,255,0.25);
-}
+input:focus{ background:rgba(255,255,255,0.25); }
 
-/* GOLD HOVER ANİMASYON BUTONU */
 .btn{
     width:100%;
     padding:14px;
@@ -122,17 +112,12 @@ input:focus{
     background: linear-gradient(120deg, transparent, rgba(255,230,140,0.6), transparent);
     transition:0.35s;
 }
-
-.btn:hover::after{
-    left:100%;
-}
+.btn:hover::after{ left:100%; }
 
 .login-btn{ background:#e5c878; color:#1c1c1c; }
 .reg-btn{ background:#765526; color:white; }
-
 .btn:hover{ transform:translateY(-2px); }
 
-/* Tema butonu */
 .themeToggle{
     position:absolute;
     top:20px; right:20px;
@@ -145,9 +130,7 @@ input:focus{
     backdrop-filter:blur(8px);
     transition:0.3s;
 }
-.themeToggle:hover{
-    background:#ffffff22;
-}
+.themeToggle:hover{ background:#ffffff22; }
 
 #msg{ margin-top:15px; min-height:22px; font-size:15px; }
 </style>
@@ -157,7 +140,6 @@ input:focus{
 
 <button class="themeToggle" onclick="toggleTheme()">🌙 Tema</button>
 
-<!-- Partiküller -->
 <script>
 for(let i=0;i<35;i++){
     let p=document.createElement("div");
@@ -184,23 +166,32 @@ for(let i=0;i<35;i++){
     <div id="msg"></div>
 </div>
 
-
 <script>
-/* SESLER — Dosyaya ihtiyaç yok */
-let clickS = new Audio(
-"data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..."
-);
-
-let loginS = new Audio(
-"data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..."
-);
-
-/* Ses autoplay için dokunma izni */
+/* SESLER */
+let clickS=new Audio("data:audio/mp3;base64,//uQx...");
+let loginS=new Audio("data:audio/mp3;base64,//uQx...");
 window.addEventListener("click",()=>{ clickS.play().catch(()=>{}); },{once:true});
 
 function hash(p){ return btoa(p); }
-
 function showMsg(t,c){ msg.style.color=c; msg.textContent=t; }
+
+/* ▼▼▼ YENİ: HER KULLANICIYA ÖZEL XP SİSTEMİ ▼▼▼ */
+function initUserXP(username){
+    if(localStorage.getItem("xp_"+username)===null){
+        localStorage.setItem("xp_"+username, 0);
+        localStorage.setItem("level_"+username, 0);
+    }
+}
+
+function loadUserXP(username){
+    let xp = localStorage.getItem("xp_"+username);
+    let level = localStorage.getItem("level_"+username);
+
+    if(xp===null || level===null){
+        initUserXP(username);
+    }
+}
+/* ▲▲▲ XP SİSTEMİ BİTTİ ▲▲▲ */
 
 function register(){
     clickS.play();
@@ -209,15 +200,15 @@ function register(){
     let p=password.value.trim();
 
     if(!u||!p){ showMsg("Boş bırakma!","red"); return; }
-
-    if(localStorage.getItem("user_"+u)){
-        showMsg("Bu kullanıcı zaten var!","red"); return;
-    }
+    if(localStorage.getItem("user_"+u)){ showMsg("Bu kullanıcı zaten var!","red"); return; }
 
     let data={password:hash(p), stats:{win:0,lose:0}, coins:0, inventory:[]};
     localStorage.setItem("user_"+u, JSON.stringify(data));
 
-    showMsg("Kayıt başarılı! Giriş yapabilirsin.","#e5c878");
+    /* Yeni kullanıcının XP verisini oluştur */
+    initUserXP(u);
+
+    showMsg("Kayıt başarılı!","rgb(229,200,120)");
 }
 
 function login(){
@@ -227,34 +218,29 @@ function login(){
     let p=password.value.trim();
 
     let stored=localStorage.getItem("user_"+u);
-
     if(!stored){ showMsg("Kullanıcı bulunamadı!","red"); return; }
 
     let data=JSON.parse(stored);
+    if(data.password!==hash(p)){ showMsg("Parola yanlış!","red"); return; }
 
-    if(data.password!==hash(p)){
-        showMsg("Parola yanlış!","red"); return;
-    }
+    /* GİRİŞTE XP YÜKLEME */
+    loadUserXP(u);
 
     loginS.play();
     localStorage.setItem("activeUser", u);
 
     document.body.style.opacity="0";
-
     setTimeout(()=> window.location.href="anamenu.html", 800);
 }
 
-/* Tema değiştirici */
+/* Tema */
 let dark=true;
 function toggleTheme(){
     clickS.play();
-
     if(dark){
         document.body.style.background="linear-gradient(135deg,#f8eed7,#f3d28c,#cfb05a,#8b6a3d)";
-        document.body.style.color="black";
     }else{
         document.body.style.background="linear-gradient(135deg,#0a0a0a,#1d1208,#4b320c,#b8943d)";
-        document.body.style.color="white";
     }
     dark=!dark;
 }
