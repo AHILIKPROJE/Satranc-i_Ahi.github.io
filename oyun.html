@@ -1331,6 +1331,56 @@ setInterval(createSparkle, 150);
 
 createParticles();
                                                         
+function startMotivationSounds() {
+    const motiveSesler = [
+        "ses5.mp3",
+        "ses6.mp3",
+        "ses7.mp3",
+        "ses8.mp3",
+        "ses9.mp3",
+        "ses10.mp3",
+        "ses11.mp3"
+    ];
+
+    let totalTime = 150; // 2:30 = 150 saniye
+    let maxPlays = 2;
+
+    let playTimes = [];
+    function generateRandomTimes() {
+        playTimes = [];
+        while (playTimes.length < maxPlays) {
+            let t = Math.floor(Math.random() * totalTime);
+            if (!playTimes.includes(t)) playTimes.push(t);
+        }
+    }
+
+    function playRandomMotiveSound() {
+        let soundFile = motiveSesler[Math.floor(Math.random() * motiveSesler.length)];
+        let audio = new Audio(soundFile);
+        audio.play();
+    }
+
+    let currentTime = totalTime;
+    generateRandomTimes();
+
+    let timer = setInterval(() => {
+        currentTime--;
+
+        if (playTimes.includes(totalTime - currentTime)) {
+            playRandomMotiveSound();
+        }
+
+        if (currentTime <= 0) {
+            clearInterval(timer);
+        }
+
+    }, 1000);
+}
+
+// --- JS'nin en altına BUNU KOY ---
+window.onload = () => {
+    startMotivationSounds();
+};
 
 </script>
 </body>
