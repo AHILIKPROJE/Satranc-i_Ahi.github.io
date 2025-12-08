@@ -175,23 +175,17 @@ window.addEventListener("click",()=>{ clickS.play().catch(()=>{}); },{once:true}
 function hash(p){ return btoa(p); }
 function showMsg(t,c){ msg.style.color=c; msg.textContent=t; }
 
-/* ▼▼▼ YENİ: HER KULLANICIYA ÖZEL XP SİSTEMİ ▼▼▼ */
-function initUserXP(username){
+/* ▼▼▼ YENİ: HER KULLANICIYA ÖZEL XP & INVENTORY ▼▼▼ */
+function initUser(username){
     if(localStorage.getItem("xp_"+username)===null){
         localStorage.setItem("xp_"+username, 0);
         localStorage.setItem("level_"+username, 0);
     }
-}
-
-function loadUserXP(username){
-    let xp = localStorage.getItem("xp_"+username);
-    let level = localStorage.getItem("level_"+username);
-
-    if(xp===null || level===null){
-        initUserXP(username);
+    if(localStorage.getItem("inventory_"+username)===null){
+        localStorage.setItem("inventory_"+username, JSON.stringify([]));
     }
 }
-/* ▲▲▲ XP SİSTEMİ BİTTİ ▲▲▲ */
+/* ▲▲▲ */
 
 function register(){
     clickS.play();
@@ -202,11 +196,11 @@ function register(){
     if(!u||!p){ showMsg("Boş bırakma!","red"); return; }
     if(localStorage.getItem("user_"+u)){ showMsg("Bu kullanıcı zaten var!","red"); return; }
 
-    let data={password:hash(p), stats:{win:0,lose:0}, coins:0, inventory:[]};
+    let data={password:hash(p), stats:{win:0,lose:0}, coins:0};
     localStorage.setItem("user_"+u, JSON.stringify(data));
 
-    /* Yeni kullanıcının XP verisini oluştur */
-    initUserXP(u);
+    /* Yeni kullanıcının XP ve inventory verisini oluştur */
+    initUser(u);
 
     showMsg("Kayıt başarılı!","rgb(229,200,120)");
 }
@@ -223,14 +217,14 @@ function login(){
     let data=JSON.parse(stored);
     if(data.password!==hash(p)){ showMsg("Parola yanlış!","red"); return; }
 
-    /* GİRİŞTE XP YÜKLEME */
-    loadUserXP(u);
+    /* GİRİŞTE XP ve inventory yükleme */
+    initUser(u);
 
     loginS.play();
-    localStorage.setItem("activeUser", u);
+    localStorage.setItem("activeUser", u); // bu kullanıcı oyunda aktif olacak
 
     document.body.style.opacity="0";
-    setTimeout(()=> window.location.href="anamenu.html", 800);
+    setTimeout(()=> window.location.href="oyun.html", 800);
 }
 
 /* Tema */
