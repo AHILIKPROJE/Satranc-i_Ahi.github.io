@@ -1327,6 +1327,8 @@ function createPauseButton() {
     btn.style.fontSize = "24px";
     btn.style.zIndex = "999999999";
     btn.style.cursor = "pointer";
+    btn.style.backdropFilter = "blur(6px)";
+    btn.style.boxShadow = "0 0 15px rgba(0,0,0,0.6)";
 
     document.body.appendChild(btn);
 
@@ -1335,9 +1337,7 @@ function createPauseButton() {
     };
 }
 
-
-
-// --- KALICI PAUSE EKRANI ---
+// --- PROFESYONEL PAUSE EKRANI ---
 function createPauseScreen() {
     if (document.getElementById("pauseScreen")) return;
 
@@ -1349,45 +1349,83 @@ function createPauseScreen() {
     div.style.left = "0";
     div.style.width = "100%";
     div.style.height = "100%";
-    div.style.background = "rgba(0,0,0,0.7)";
+    div.style.background = "rgba(0,0,0,0.65)";
     div.style.display = "none";
     div.style.justifyContent = "center";
     div.style.alignItems = "center";
     div.style.zIndex = "999999998";
+    div.style.backdropFilter = "blur(8px)";
 
     div.innerHTML = `
-        <div style="background:#222;padding:30px;border-radius:15px;text-align:center;color:white;min-width:250px;">
-            <h2>Oyun Duraklatıldı</h2>
-            <button id="resumeBtn">Devam Et</button><br><br>
-            <button id="restartBtn">Yeniden Başlat</button><br><br>
-            <button id="menuBtn">Ana Menü</button><br><br>
-            <button id="settingsBtn">Ayarlar</button>
+        <div style="
+            background: rgba(255,255,255,0.12);
+            padding: 35px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            min-width: 260px;
+            border: 1px solid rgba(255,255,255,0.25);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        ">
+            <h2 style="margin-top:0;margin-bottom:25px;font-size:26px;">Oyun Duraklatıldı</h2>
+
+            <button id="resumeBtn" class="pauseBtn">Devam Et</button><br>
+            <button id="restartBtn" class="pauseBtn">Yeniden Başlat</button><br>
+            <button id="menuBtn" class="pauseBtn">Ana Menü</button><br>
+            <button id="settingsBtn" class="pauseBtn">Ayarlar</button><br>
+            <button id="purchasedBtn" class="pauseBtn">Satın Aldıklarım</button>
         </div>
     `;
 
     document.body.appendChild(div);
 
-    // BUTON FONKSİYONLARI
+    // Butonlar için ortak CSS
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .pauseBtn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(0,0,0,0.55);
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: 0.2s;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        }
+        .pauseBtn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+    `;
+    document.head.appendChild(style);
+
+    // --- BUTON FONKSİYONLARI ---
     document.getElementById("resumeBtn").onclick = () => {
         div.style.display = "none";
     };
 
     document.getElementById("restartBtn").onclick = () => {
-        location.reload(); // En güvenlisi
+        location.reload();
     };
 
     document.getElementById("menuBtn").onclick = () => {
         window.location.href = "anamenu.html";
     };
 
-    // AYARLAR AÇMA
     document.getElementById("settingsBtn").onclick = () => {
         createSettingsPanel();
         document.getElementById("settingsPanel").style.display = "block";
     };
+
+    document.getElementById("purchasedBtn").onclick = () => {
+        createPurchasedPanel();
+        document.getElementById("fullPurchasedPanel").style.display = "flex";
+    };
 }
-
-
 
 // --- AYARLAR PANELİ ---
 function createSettingsPanel() {
@@ -1400,36 +1438,43 @@ function createSettingsPanel() {
     panel.style.top = "50%";
     panel.style.left = "50%";
     panel.style.transform = "translate(-50%, -50%)";
-    panel.style.background = "#111";
-    panel.style.padding = "25px";
-    panel.style.borderRadius = "12px";
+    panel.style.padding = "30px";
+    panel.style.borderRadius = "18px";
     panel.style.textAlign = "center";
-    panel.style.minWidth = "250px";
+    panel.style.minWidth = "280px";
     panel.style.color = "white";
-    panel.style.border = "2px solid #444";
     panel.style.zIndex = "999999999";
     panel.style.display = "none";
 
+    panel.style.background = "rgba(255,255,255,0.12)";
+    panel.style.backdropFilter = "blur(10px)";
+    panel.style.boxShadow = "0 8px 25px rgba(0,0,0,0.4)";
+    panel.style.border = "1px solid rgba(255,255,255,0.25)";
+
     panel.innerHTML = `
-        <h3>Ayarlar</h3>
-
-        <label style="font-size:18px;">
+        <h2 style="margin-top:0;margin-bottom:20px;font-size:24px;">Ayarlar</h2>
+        <div style="margin-bottom:20px; font-size:18px;">
             Ses:
-            <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="1">
-        </label>
-
-        <br><br>
-        <button id="closeSettings">Kapat</button>
+            <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="1" style="width:100%;">
+        </div>
+        <button id="closeSettings" style="
+            width:100%;
+            padding:12px;
+            background:#e74c3c;
+            border:none;
+            border-radius:12px;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+        ">Kapat</button>
     `;
 
     document.body.appendChild(panel);
 
-    // --- PANEL KAPATMA ---
     document.getElementById("closeSettings").onclick = () => {
         panel.style.display = "none";
     };
 
-    // --- SES AYARI ---
     const slider = document.getElementById("volumeSlider");
     slider.oninput = () => {
         if (typeof music !== "undefined") {
@@ -1438,6 +1483,152 @@ function createSettingsPanel() {
     };
 }
 
+// --- TAM EKRAN PROFESYONEL SATIN ALDIKLARIM PANELİ ---
+function createPurchasedPanel() {
+    if (document.getElementById("fullPurchasedPanel")) return;
+
+    const panel = document.createElement("div");
+    panel.id = "fullPurchasedPanel";
+
+    panel.style.position = "fixed";
+    panel.style.top = "0";
+    panel.style.left = "0";
+    panel.style.width = "100%";
+    panel.style.height = "100%";
+    panel.style.background = "rgba(0,0,0,0.85)";
+    panel.style.display = "none";
+    panel.style.flexDirection = "column";
+    panel.style.alignItems = "center";
+    panel.style.justifyContent = "flex-start";
+    panel.style.padding = "40px";
+    panel.style.zIndex = "999999999";
+    panel.style.backdropFilter = "blur(10px)";
+    panel.style.overflowY = "auto";
+
+    panel.innerHTML = `
+        <h1 style="color:#f8e7c3; font-size:36px; margin-bottom:30px; text-shadow:0 0 15px rgba(0,0,0,0.7);">Satın Aldıklarım</h1>
+
+        <div id="fullPurchaseTabs" style="display:flex; gap:20px; margin-bottom:25px;">
+            <button class="fullTab active" data-tab="tas">Taşlar</button>
+            <button class="fullTab" data-tab="tahta">Tahtalar</button>
+            <button class="fullTab" data-tab="muzik">Müzikler</button>
+        </div>
+
+        <div id="fullPurchaseContent" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:25px; width:100%;"></div>
+
+        <button id="closeFullPurchased" style="
+            margin-top:35px; padding:15px 30px;
+            background:#e74c3c; color:white;
+            border:none; border-radius:15px; cursor:pointer;
+            font-size:18px;
+        ">Kapat</button>
+    `;
+
+    document.body.appendChild(panel);
+
+    const style = document.createElement("style");
+    style.innerHTML = `
+        .fullTab {
+            padding:10px 25px;
+            border-radius:12px;
+            background:#a67c2e;
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+            font-size:18px;
+            border:none;
+            box-shadow:0 4px 12px rgba(0,0,0,0.5);
+            transition:0.2s;
+        }
+        .fullTab.active { background:#555; color:#f8e7c3; }
+        .fullItem {
+            background:rgba(75,50,32,0.85);
+            border:2px solid #a67c2e;
+            border-radius:15px;
+            padding:15px;
+            text-align:center;
+            color:#f8e7c3;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            transition:0.2s;
+        }
+        .fullItem img {
+            width:100%;
+            height:150px;
+            object-fit:contain;
+            border-radius:12px;
+            margin-bottom:10px;
+        }
+        .fullSelect {
+            margin-top:10px;
+            padding:8px 12px;
+            border:none;
+            border-radius:10px;
+            background:#a67c2e;
+            color:white;
+            cursor:pointer;
+            font-weight:bold;
+            transition:0.2s;
+        }
+        .fullSelect.selected {
+            background:#555;
+            transform:scale(1.05);
+            pointer-events:none;
+        }
+        .fullItem:hover { transform:scale(1.02); box-shadow:0 0 15px rgba(0,0,0,0.6); }
+    `;
+    document.head.appendChild(style);
+
+    document.getElementById("closeFullPurchased").onclick = () => panel.style.display = "none";
+
+    // Tab switch
+    document.querySelectorAll(".fullTab").forEach(tab=>{
+        tab.onclick = ()=>{
+            document.querySelectorAll(".fullTab").forEach(t=>t.classList.remove("active"));
+            tab.classList.add("active");
+            loadFullPurchased(tab.dataset.tab);
+        };
+    });
+
+    // Load function
+    function loadFullPurchased(category){
+        const content = document.getElementById("fullPurchaseContent");
+        const activeUser = localStorage.getItem("activeUser");
+        let inventory = JSON.parse(localStorage.getItem("inventory_"+activeUser)) || [];
+        const items = inventory.filter(i=>i.category===category);
+
+        content.innerHTML = items.length ? items.map(i=>`
+            <div class="fullItem">
+                <img src="${i.img||'https://via.placeholder.com/150'}" alt="${i.name}">
+                <div style="font-size:18px; font-weight:bold;">${i.name}</div>
+                <div style="margin:5px 0;">${i.price} akçe</div>
+                <button class="fullSelect ${i.selected?'selected':''}" data-name="${i.name}" data-cat="${i.category}">
+                    ${i.selected?'Seçildi':'Seç'}
+                </button>
+            </div>
+        `).join('') : "<div style='color:white;font-size:20px;'>Bu kategoride ürün yok.</div>";
+
+        document.querySelectorAll(".fullSelect").forEach(btn=>{
+            btn.onclick = ()=>{
+                const name=btn.dataset.name; const cat=btn.dataset.cat;
+                inventory.filter(x=>x.category===cat).forEach(x=>x.selected=false);
+                const selItem = inventory.find(x=>x.name===name);
+                if(selItem) selItem.selected=true;
+                document.querySelectorAll(`.fullSelect[data-cat='${cat}']`).forEach(b=>{
+                    const sel = inventory.find(x=>x.name===b.dataset.name);
+                    b.textContent = sel.selected?'Seçildi':'Seç';
+                    b.classList.toggle('selected',sel.selected);
+                });
+                localStorage.setItem("inventory_"+activeUser, JSON.stringify(inventory));
+            };
+        });
+    }
+}
+
+// --- INIT ---
+createPauseButton();
+createPauseScreen();
 
 
 // --- KONTROL: BUTONLAR VE EKRAN SİLİNİRSE TEKRAR OLUŞSUN ---
@@ -1662,42 +1853,6 @@ document.querySelectorAll(".profileTab").forEach(tab => {
 let activeUser = localStorage.getItem("activeUser") || "Kullanıcı";
 document.getElementById("profileName").innerText = activeUser;
 document.getElementById("profileTag").innerText = "#" + activeUser.toLowerCase();
-                          
-  // --- AKÇE YÜKLEME ---
-function loadAkce() {
-    let activeUser = localStorage.getItem("activeUser");
-    if (!activeUser) return;
-
-    let userData = JSON.parse(localStorage.getItem("user_" + activeUser));
-
-    if (!userData.coins) userData.coins = 50;
-
-    document.getElementById("akce").textContent = userData.coins;
-}
-
-loadAkce();
-                        
-                          
-           // --- AKÇE EKLE / ÇIKAR ---
-function updateAkce(amount) {
-    let activeUser = localStorage.getItem("activeUser");
-    if (!activeUser) return;
-
-    let userData = JSON.parse(localStorage.getItem("user_" + activeUser));
-
-    userData.coins += amount;
-
-    // KAYDET
-    localStorage.setItem("user_" + activeUser, JSON.stringify(userData));
-
-    // EKRANA YAZ
-    document.getElementById("akce").textContent = userData.coins;
-}
-               
-                          
-                          
-                          
-                          
 
 </script>
 </body>
