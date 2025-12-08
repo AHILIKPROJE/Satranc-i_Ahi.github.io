@@ -475,6 +475,33 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
     transform: scale(1.08);
     box-shadow: 0 0 22px rgba(255, 215, 0, 1);
 }
+.infoRow {
+    position: absolute;
+    top: 17px;               /* 🔼 Bir tık yukarı */
+    right: 190px;            /* ⬅ Biraz daha sola */
+    background: rgba(0, 0, 0, 0.55);
+    padding: 10px 20px;
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 215, 0, 0.55);
+    font-size: 19px;
+    z-index: 9999;
+    display: flex;
+    gap: 22px;
+    align-items: center;
+
+    /* çok daha profesyonel bir parlama */
+    box-shadow:
+      0 0 14px rgba(255,215,0,0.28),
+      inset 0 0 8px rgba(255,215,0,0.15);
+}
+
+/* Akçe ikonu */
+.akceBox::before {
+    content: "🪙";
+    margin-right: 6px;
+    filter: drop-shadow(0 0 4px rgba(255,215,0,0.4));
+}
 
 </style>
 </head>
@@ -1635,6 +1662,42 @@ document.querySelectorAll(".profileTab").forEach(tab => {
 let activeUser = localStorage.getItem("activeUser") || "Kullanıcı";
 document.getElementById("profileName").innerText = activeUser;
 document.getElementById("profileTag").innerText = "#" + activeUser.toLowerCase();
+                          
+  // --- AKÇE YÜKLEME ---
+function loadAkce() {
+    let activeUser = localStorage.getItem("activeUser");
+    if (!activeUser) return;
+
+    let userData = JSON.parse(localStorage.getItem("user_" + activeUser));
+
+    if (!userData.coins) userData.coins = 50;
+
+    document.getElementById("akce").textContent = userData.coins;
+}
+
+loadAkce();
+                        
+                          
+           // --- AKÇE EKLE / ÇIKAR ---
+function updateAkce(amount) {
+    let activeUser = localStorage.getItem("activeUser");
+    if (!activeUser) return;
+
+    let userData = JSON.parse(localStorage.getItem("user_" + activeUser));
+
+    userData.coins += amount;
+
+    // KAYDET
+    localStorage.setItem("user_" + activeUser, JSON.stringify(userData));
+
+    // EKRANA YAZ
+    document.getElementById("akce").textContent = userData.coins;
+}
+               
+                          
+                          
+                          
+                          
 
 </script>
 </body>
