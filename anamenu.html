@@ -334,7 +334,7 @@ const sahneler = {
     {isim:"menuayarlar",x:700,y:850,width:470,height:160},
     {isim:"dukkan_hitbox",x:696,y:573,width:504,height:187}
   ],
-  "giris.png":[
+  "mod.png":[
     {isim:"giris_test",x:47,y:48,width:130,height:122},
     {isim:"mertebe",x:594,y:216,width:740,height:181},
     {isim:"arsiv_kapi",x:601,y:497,width:730,height:171},
@@ -380,13 +380,13 @@ gorevSayfalari.forEach((sayfa,i)=>{
 // Sahneler arası geri geçiş hedefleri
 const backTargets = {
   "giris_test":"menu.png",
-  "arsiv_geri":"giris.png",
-  "aciklama1_geri":"giris.png",
+  "arsiv_geri":"mod.png",
+  "aciklama1_geri":"mod.png",
   "aciklama2_geri":"aciklama1.png",
-  "geri2":"giris.png",
+  "geri2":"mod.png",
   "bılgı1_geri":"menu.png"
 };
-gorevSayfalari.forEach((sayfa,i)=>backTargets[`gorev_geri_${i+5}`]='giris.png');
+gorevSayfalari.forEach((sayfa,i)=>backTargets[`gorev_geri_${i+5}`]='mod.png');
 
 // Fonksiyonlar
 function gunlukGorevSec() {
@@ -473,22 +473,22 @@ function hitboxlariYukle(){
 
       if(aktifArkaPlan==='soru.png'){
         if(h.isim==='geri1'){ playSayfa(); if(gunlukGorevSayfasi) return sahneDegistir(gunlukGorevSayfasi);}
-        if(h.isim==='geri2'){ playSayfa(); return sahneDegistir(oncekiSahne || 'giris.png'); }
+        if(h.isim==='geri2'){ playSayfa(); return sahneDegistir(oncekiSahne || 'mod.png'); }
         if(h.isim==='ileri'){ playSayfa(); return sahneDegistir('sualhane.png'); }
       }
 
       if(h.isim.startsWith('unlem_hitbox_')){ playSayfa(); return sahneDegistir('soru.png'); }
-      if(h.isim==='sualhane_geri'){ playSayfa(); return sahneDegistir(oncekiSahne || 'giris.png'); }
+      if(h.isim==='sualhane_geri'){ playSayfa(); return sahneDegistir(oncekiSahne || 'mod.png'); }
       if(backTargets[h.isim]) return sahneDegistir(backTargets[h.isim]);
 
-      if(h.isim==='menuoyna') return sahneDegistir('giris.png');
+      if(h.isim==='menuoyna') return sahneDegistir('mod.png');
       if(h.isim==='menuayarlar') return sahneDegistir('ayarlar.png');
       if(h.isim==='ayarlar_solust') return sahneDegistir('menu.png');
       if(h.isim==='tahta_gorunumu') return sahneDegistir('dukkantahta.png');
       if(h.isim==='tas_gorunumu') return sahneDegistir('tahtadukkan.png');
       if(h.isim==='menu') return sahneDegistir('menu.png');
       if(h.isim==='mertebe') return sahneDegistir('arsiv.png');
-      if(h.isim==='aciklama1geri') return sahneDegistir('giris.png');
+      if(h.isim==='aciklama1geri') return sahneDegistir('mod.png');
       if(h.isim==='aciklama1ileri') { playSayfa(); return sahneDegistir('aciklama2.png'); }
       if(h.isim==='aciklama2geri') { playSayfa(); return sahneDegistir('aciklama1.png'); }
 
