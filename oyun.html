@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -507,6 +508,191 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
     box-shadow: 0 0 25px #ffd563;
 }
 
+/* === GÜNLÜK ÖDÜL BUTONU === */
+#dailyBtn{
+  position:fixed;
+  top:15px;
+  left:190px;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  padding:12px 22px;
+  border-radius:18px;
+  border:none;
+
+  background:linear-gradient(135deg,#ffcc33,#ff9800);
+  color:#2a1a00;
+
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+  z-index:1000;
+
+  box-shadow:
+    0 10px 25px rgba(255,170,0,.9),
+    inset 0 0 8px rgba(255,255,255,.4);
+
+  transition:.3s;
+}
+#dailyBtn:hover{
+  transform:translateY(-2px) scale(1.06);
+  box-shadow:0 15px 35px rgba(255,200,0,1);
+}
+#dailyBtn .icon{
+  font-size:20px;
+  animation:giftPulse 1.6s infinite;
+}
+@keyframes giftPulse{
+  0%{transform:scale(1)}
+  100%{transform:scale(1.15)}
+}
+
+/* === OVERLAY === */
+#dailyOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+
+/* === PANEL === */
+#dailyPanel{
+  width:400px;
+  padding:24px;
+  border-radius:26px;
+
+  background:linear-gradient(135deg,#1b1b2f,#2c2c44);
+  box-shadow:0 30px 70px rgba(0,0,0,.9);
+
+  animation:panelPop .35s ease;
+}
+
+@keyframes panelPop{
+  from{transform:scale(.85);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+/* === HEADER === */
+.panelHeader{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  font-size:22px;
+  font-weight:900;
+  color:#ffd54f;
+  margin-bottom:18px;
+}
+
+/* === GÜNLER === */
+.days{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.day{
+  background:#2c2c44;
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+}
+
+.day.locked{
+  opacity:.35;
+}
+
+.day.active{
+  background:linear-gradient(135deg,#1eff7a,#00c853);
+  color:#003a1d;
+  box-shadow:0 0 18px #1eff7a;
+}
+
+.day.taken{
+  background:#444;
+  color:#aaa;
+}
+
+/* === YAZILAR === */
+.day-title{
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.reward{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  font-weight:900;
+  color:#ffd54f;
+  text-shadow:0 0 8px rgba(255,213,79,.8);
+}
+.reward .coin{
+  font-size:18px;
+  animation:coinGlow 1.4s infinite alternate;
+}
+@keyframes coinGlow{
+  from{transform:scale(1)}
+  to{transform:scale(1.2)}
+}
+
+/* === ŞİMDİ AL === */
+.claimBtn{
+  margin-top:8px;
+  padding:6px 12px;
+  border:none;
+  border-radius:12px;
+  background:#0b5;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+  animation:pulse 1.4s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(30,255,122,.7)}
+  100%{box-shadow:0 0 0 14px rgba(30,255,122,0)}
+}
+
+/* === ALINDI === */
+.day.taken::after{
+  content:"✔ ALINDI";
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,.65);
+  font-weight:900;
+  color:#1eff7a;
+  animation:fadeIn .4s ease;
+}
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+/* === KAPAT === */
+#closeDaily{
+  margin-top:18px;
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:14px;
+  background:#ff4d4d;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+}
 
 /* Panel */
 #gorevPanel {
@@ -769,6 +955,27 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
   </div>
 </div>
 
+<!-- GÜNLÜK ÖDÜL BUTONU -->
+<button id="dailyBtn">
+  <span class="icon">🎁</span>
+  Günlük Ödül
+</button>
+
+<!-- OVERLAY -->
+<div id="dailyOverlay">
+  <div id="dailyPanel">
+    <div class="panelHeader">
+      <span>🎁</span>
+      Günlük Giriş Ödülleri
+    </div>
+
+    <div class="days"></div>
+
+    <button id="closeDaily">Kapat</button>
+  </div>
+</div>
+    
+    
 <script>
 let winSounds = [
     new Audio("zafer1.mp3"),
@@ -932,17 +1139,7 @@ let questions = [
   {q:"Osmanlı’da loncaların merkezi otoriteye bağlanması hangi padişah döneminde hız kazanmıştır?",a:["Kanuni Sultan Süleyman","I. Mahmud","II. Bayezid","III. Selim"],correct:0,hint:"Kanunname-i İhtisab’ın etkisi büyüktür."},
   {q:"Ahilikte kusurlu mal üreten esnafa verilen en hafif ceza hangisidir?",a:["Dükkan kapatma","Topluluk önünde uyarı","Pabucu dama atma","Meslekten çıkarma"],correct:1,hint:"İlk aşamada verilen sosyal uyarıdır."},
   {q:"Ahi örgütlerinin Anadolu’da ticaret yollarının güvenliğini artırması hangi mekanizma ile sağlanmıştır?",a:["Saray askerleri","Esnaf nöbet sistemi","Vergi indirimleri","Kervansaray müfettişleri"],correct:1,hint:"Zanaatkârların ortak nöbet düzeni vardı."},
-  {q:"Ahiliğin toplumsal düzen üzerindeki en büyük etkisi aşağıdakilerden hangisidir?",a:["Savaş gücünü artırmak","Toplumsal ahlakı ve üretim düzenini yapılandırmak","Devlet harcamalarını azaltmak","Saray kültürünü yaymak"],correct:1,hint:"Hem ekonomi hem ahlak üzerinde belirleyici oldu."},
-  {q:"Fütüvvet anlayışında cömertlik neyi ifade eder?", a:["Zengin olmayı","Malı sadece yakınlarla paylaşmayı","Karşılık beklemeden paylaşmayı","Sadece dini yardım yapmayı"], correct:2, hint:"İnfak ve paylaşım esastır."},
-  {q:"Fütüvvet ahlakında 'eline sahip olmak' ne anlama gelir?", a:["Silah kullanmayı","Haramdan ve haksızlıktan uzak durmayı","Çalışmayı bırakmayı","Sadece kendi işini yapmayı"], correct:1, hint:"Haksız kazançtan kaçınmayı ifade eder."},
-  {q:"Fütüvvet anlayışına göre 'diline sahip olmak' hangi davranışı kapsar?", a:["Çok konuşmayı","Yalan ve kırıcı sözden kaçınmayı","Sadece susmayı","Emir vermeyi"], correct:1, hint:"Söz ahlakı önemlidir."},
-  {q:"Fütüvvet geleneğinde 'beline sahip olmak' ilkesi neyi temsil eder?", a:["Fiziksel gücü","Ahlaki ve nefsani kontrolü","Zenginliği","Mesleki yetkinliği"], correct:1, hint:"Nefis terbiyesi ile ilgilidir."},
-  {q:"Ahilik sisteminde fütüvvet anlayışı en çok hangi alanı şekillendirmiştir?", a:["Askeri yapı","Esnaf ahlakı","Devlet yönetimi","Vergi sistemi"], correct:1, hint:"Meslek ahlakı temel alınır."},
-  {q:"Fütüvvetnamelerde yer alan kuralların temel amacı nedir?", a:["Devlete bağlılığı artırmak","Ticareti sınırlandırmak","Bireyin ahlaki olgunluğunu sağlamak","Askeri disiplini öğretmek"], correct:2, hint:"Ahlaki eğitim ön plandadır."},
-  {q:"Ahilikte fütüvvet anlayışına göre aşağıdakilerden hangisi makbul değildir?", a:["Sabır","Tevazu","Hile","Cömertlik"], correct:2, hint:"Ahlaka aykırı davranıştır."},
-  {q:"Fütüvvet anlayışında 'yiğit' kimdir?", a:["Savaşta başarılı olan","Zengin ve güçlü olan","Ahlaklı, fedakâr ve adil kişi","Devlet görevlisi"], correct:2, hint:"Yiğitlik ahlakla tanımlanır."},
-  {q:"Ahilik ve fütüvvet anlayışında 'kardeşlik' kavramı neyi güçlendirir?", a:["Rekabeti","Toplumsal dayanışmayı","Bireyselliği","Siyasi otoriteyi"], correct:1, hint:"Birlik ve yardımlaşma esastır."},
-  {q:"Fütüvvet geleneğinde nefsi terbiye etmek neden önemlidir?", a:["Zenginleşmek için","Toplumsal ve bireysel ahlakı korumak için","Siyasi güç kazanmak için","Askeri başarı için"], correct:1, hint:"Hem bireyi hem toplumu korur."},
+  {q:"Ahiliğin toplumsal düzen üzerindeki en büyük etkisi aşağıdakilerden hangisidir?",a:["Savaş gücünü artırmak","Toplumsal ahlakı ve üretim düzenini yapılandırmak","Devlet harcamalarını azaltmak","Saray kültürünü yaymak"],correct:1,hint:"Hem ekonomi hem ahlak üzerinde belirleyici oldu."}
 
 ];
 questions.forEach(q => {
@@ -2001,7 +2198,86 @@ ahiContinue.onclick = () => {
   setTimeout(()=>{
     window.location.href = "ahibot.html";
   },500);
-};                                                 
+};     
+                          
+ const dailyBtn = document.getElementById("dailyBtn");
+const overlay = document.getElementById("dailyOverlay");
+const panelDays = document.querySelector(".days");
+const closeDaily = document.getElementById("closeDaily");
+
+dailyBtn.onclick = () => {
+  overlay.style.display = "flex";
+  renderDaily();
+};
+closeDaily.onclick = () => overlay.style.display = "none";
+
+const DAY_KEY = "ahi_day";
+const CLAIM_KEY = "ahi_claim";
+const DATE_KEY = "ahi_date";
+
+function todayTR(){
+  return new Date().toLocaleDateString("tr-TR");
+}
+
+function renderDaily(){
+  panelDays.innerHTML="";
+
+  let day = Number(localStorage.getItem(DAY_KEY)) || 1;
+  let claimed = localStorage.getItem(CLAIM_KEY)==="true";
+  let lastDate = localStorage.getItem(DATE_KEY);
+  let today = todayTR();
+
+  if(lastDate !== today){
+    claimed = false;
+    localStorage.setItem(CLAIM_KEY,"false");
+  }
+
+  for(let i=1;i<=7;i++){
+    const div=document.createElement("div");
+    div.className="day";
+
+    div.innerHTML = `
+      <div class="day-title">Gün ${i}</div>
+      <div class="reward">
+        <span class="coin">🪙</span>
+        +${i*10} Akçe
+      </div>
+    `;
+
+    if(i < day){
+      div.classList.add("taken");
+    }
+    else if(i === day && !claimed){
+      div.classList.add("active");
+
+      const btn=document.createElement("button");
+      btn.className="claimBtn";
+      btn.textContent="Şimdi Al!";
+
+      btn.onclick = ()=>{
+        const reward = i*10;
+        playerAkce += reward;
+        akceEl.textContent = playerAkce;
+
+        localStorage.setItem(CLAIM_KEY,"true");
+        localStorage.setItem(DATE_KEY,today);
+        localStorage.setItem(DAY_KEY, i===7 ? 1 : i+1);
+
+        renderDaily();
+      };
+
+      div.appendChild(btn);
+    }
+    else{
+      div.classList.add("locked");
+    }
+
+    panelDays.appendChild(div);
+  }
+}
+                         
+                          
+                                                                      
 </script>
 </body>
 </html>
