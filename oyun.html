@@ -297,6 +297,101 @@ html,body{margin:0;padding:0;width:100%;height:100%;background:#22262f;display:f
     background: #f5d48a;
     color: #1a1a1a;
 }
+/* === Ahi Bot Floating Button === */
+#ahi-bot-btn{
+  position:fixed;
+  bottom:25px;
+  left:25px;
+  background:linear-gradient(135deg,#ff6f61,#ff3d3d);
+  color:#fff;
+  padding:14px 22px;
+  border-radius:30px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,.6);
+  transition:.3s;
+  z-index:999;
+}
+#ahi-bot-btn:hover{
+  transform:scale(1.1);
+  box-shadow:0 15px 35px rgba(0,0,0,.8);
+}
+
+/* === Overlay === */
+#ahi-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+  animation:fadeIn .4s ease;
+}
+
+/* === Panel === */
+#ahi-panel{
+  width:420px;
+  background:linear-gradient(135deg,#1e1e2f,#2c2c44);
+  border-radius:25px;
+  padding:35px;
+  color:#fff;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.8);
+  animation:slideUp .4s ease;
+}
+#ahi-panel h2{
+  font-family:'Fredoka One',cursive;
+  color:#ff6f61;
+  font-size:34px;
+}
+#ahi-panel h2 span{
+  font-size:18px;
+  color:#ccc;
+}
+#ahi-panel p{
+  line-height:1.6;
+  margin:20px 0 30px;
+}
+
+/* === Buttons === */
+.ahi-actions{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+}
+#ahi-cancel{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  background:#c0392b;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+#ahi-continue{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:20px;
+  background:#27ae60;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+#ahi-cancel:hover{background:#e74c3c}
+#ahi-continue:hover{background:#2ecc71}
+
+/* === Animations === */
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes slideUp{
+  from{transform:translateY(40px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
 
 /* --- LEVEL BAR --- */
 #levelBox{
@@ -655,6 +750,24 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
 </div>
 
 <button id="profileBtn">Profil</button>
+                                                       
+<!-- Ahi Bot Butonu -->
+<div id="ahi-bot-btn">🤖 Ahi Bot</div>
+
+<!-- Ahi Bot Panel -->
+<div id="ahi-overlay">
+  <div id="ahi-panel">
+    <h2>Ahi Bot <span>(Yamak)</span></h2>
+    <p>
+      Bu bot <b>AhilikProje</b> ekibi tarafından geliştirilme aşamasındadır.<br><br>
+      Burada aklındaki soruları sorabilir ve cevaplar alabilirsin.
+    </p>
+    <div class="ahi-actions">
+      <button id="ahi-cancel">İptal</button>
+      <button id="ahi-continue">Devam Et</button>
+    </div>
+  </div>
+</div>
 
 <script>
 let winSounds = [
@@ -1855,6 +1968,30 @@ let activeUser = localStorage.getItem("activeUser") || "Kullanıcı";
 document.getElementById("profileName").innerText = activeUser;
 document.getElementById("profileTag").innerText = "#" + activeUser.toLowerCase();
 
+
+const ahiBtn = document.getElementById("ahi-bot-btn");
+const ahiOverlay = document.getElementById("ahi-overlay");
+const ahiCancel = document.getElementById("ahi-cancel");
+const ahiContinue = document.getElementById("ahi-continue");
+
+/* Aç */
+ahiBtn.onclick = () => {
+  ahiOverlay.style.display = "flex";
+};
+
+/* Kapat */
+ahiCancel.onclick = () => {
+  ahiOverlay.style.display = "none";
+};
+
+/* Devam Et – Karartmalı Geçiş */
+ahiContinue.onclick = () => {
+  document.body.style.transition = "0.5s";
+  document.body.style.filter = "brightness(0.2)";
+  setTimeout(()=>{
+    window.location.href = "ahibot.html";
+  },500);
+};                                                 
 </script>
 </body>
 </html>
