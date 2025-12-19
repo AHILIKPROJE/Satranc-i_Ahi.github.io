@@ -436,11 +436,110 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
   background:#00d09c;color:#000;font-weight:bold;cursor:pointer;
 }
 
-.infoPopup{
-  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-  background:#fff;color:#1B1813;padding:20px;border-radius:12px;z-index:800;width:400px;text-align:center;
-  box-shadow:0 8px 48px rgba(0,0,0,0.6);
+/* ===== Black & Gold Premium Popup ===== */
+
+.popupOverlay{
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(0,0,0,0.55),
+    rgba(0,0,0,0.85)
+  );
+  backdrop-filter: blur(4px);
+  z-index: 900;
 }
+
+.infoPopup{
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.92);
+
+  width: 420px;
+  padding: 30px 28px;
+
+  background: linear-gradient(
+    160deg,
+    #0f0f0f,
+    #1a1a1a,
+    #0c0c0c
+  );
+
+  color: #f5e6b8;
+  text-align: center;
+
+  border-radius: 20px;
+  border: 1px solid rgba(212,175,55,0.35);
+
+  box-shadow:
+    0 25px 70px rgba(0,0,0,0.8),
+    inset 0 0 0 1px rgba(212,175,55,0.15);
+
+  z-index: 1000;
+
+  animation: goldPopupIn 0.4s ease-out forwards;
+}
+
+/* Altın parlama efekti */
+.infoPopup::before{
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 20px;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(212,175,55,0.4),
+    transparent
+  );
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.infoPopup h1{
+  margin-bottom: 18px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #d4af37;
+  text-shadow: 0 0 12px rgba(212,175,55,0.35);
+}
+
+.infoPopup p{
+  font-size: 15px;
+  line-height: 1.7;
+  color: #e8dca8;
+}
+
+/* Kapatma Butonu */
+.infoPopup .closeBtn{
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-size: 18px;
+  cursor: pointer;
+  color: #d4af37;
+  opacity: 0.7;
+}
+
+.infoPopup .closeBtn:hover{
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(212,175,55,0.7);
+}
+
+/* Açılış animasyonu */
+@keyframes goldPopupIn{
+  from{
+    opacity: 0;
+    transform: translate(-50%, -55%) scale(0.85);
+  }
+  to{
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 #bgParticles {
     position: fixed;
     top: 0;
@@ -891,14 +990,17 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
 </div>
 
 <div class="infoPopup" id="infoPopup">
-  <h1>-Oyun Bilgisi-</h1>
-  <p>*🦊 Tilki sizi 3 kare geri getirir.<br>
-    * 🐴 At sizi 3 kare ileri taşır.<br>
- *Güç satın alarak ilerlemenizi kolaylaştırabilirsiniz.<br>
-*Oyun sonlarında sandık açarak akçe kazanabilirsiniz.<br>
-    * Her 3 karede bir soru çıkar.<br>
-    * Doğru cevap verirsen ilerler.<br>
-    * Yanlış cevapta süre -10 saniye.</p>
+<h1>🎮 Oyun Bilgileri</h1>
+<p>
+🦊 Tilki ile karşılaşırsan 3 kare geri gidersin.<br>
+🐴 At seni 3 kare ileri taşır.<br><br>
+💪 Güç satın alarak oyunda daha hızlı ilerleyebilirsin.<br>
+🎁 Oyun sonunda sandık açarak akçe kazanabilirsin.<br><br>
+❓ Her 5 karede bir soru karşına çıkar.<br>
+✅ Doğru cevap verirsen ilerlersin.<br>
+❌ Yanlış cevapta süreden 10 saniye düşer.
+</p>
+
   <button id="infoOkBtn">Anladım</button>
 </div>
   <div id="overlayBG"></div>
