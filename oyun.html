@@ -1409,7 +1409,7 @@ document.getElementById("chest").style.display = "block";
     placePiece();
     await wait(160);
 
-    if(stepCounter % 3 === 0){
+    if(stepCounter % 5 === 0){
       const correct = await askQuestionPopup();
       showExplosion(correct);
       if(!correct){
