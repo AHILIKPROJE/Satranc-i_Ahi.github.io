@@ -75,7 +75,23 @@ Ben sana sade, anlaşılır ve öğretici cevaplar vermek için buradayım.
 Haydi, bilgeliğe giden yola birlikte çıkalım. 🌿</div>
         </div>
         <div class="typing" id="typing">Ahi Bot yazıyor...</div>
-        <div class="footer">
+    <div style="display:flex; justify-content:center; margin-bottom:6px;">
+    <button id="toggleSuggestBtn" onclick="toggleSuggestions()"
+        style="
+            background:#1e293b;
+            border:1px solid #334155;
+            color:#f8fafc;
+            padding:6px 14px;
+            border-radius:999px;
+            font-size:11px;
+            cursor:pointer;
+            transition:0.2s;
+        ">
+        💡 Soru Önerileri: Açık
+    </button>
+</div>
+
+      <div class="footer">
             <input type="text" id="userInput" placeholder="Mesajınızı buraya yazın..." autocomplete="off">
             <button id="sendBtn" onclick="handleSend()" style="background:var(--primary); color:white; border:none; width:50px; border-radius:12px; cursor:pointer; font-size:18px;">➤</button>
         </div>
@@ -404,7 +420,39 @@ karsilastirmali: [
 
         setTimeout(() => {
             document.getElementById('typing').style.display = 'none';
-            addMessage(findResponse(text), 'bot-msg');
+     const answer = findResponse(text);
+addMessage(answer, 'bot-msg');
+
+if (suggestionsEnabled) {
+    const suggested = suggestQuestions(answer);
+
+    if (suggested.length > 0) {
+        const container = document.createElement("div");
+        container.className = "msg bot-msg";
+
+        container.innerHTML = `
+            <strong>Bunu da merak edebilirsin:</strong><br>
+            ${suggested.map(q => `
+                <div style="
+                    margin-top:6px;
+                    padding:6px 10px;
+                    background:#0f172a;
+                    border:1px solid #334155;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-size:13px;
+                " onclick="handleSend('${q.replace(/'/g, "\\'")}')">
+                    ${q}
+                </div>
+            `).join("")}
+        `;
+
+        chatBox.appendChild(container);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+}
+
+
         }, 600);
     }
 
@@ -437,6 +485,48 @@ karsilastirmali: [
 function closeWelcomeModal() {
     document.getElementById('devAlertModal').classList.remove('active');
 }
+  
+let lastSuggestions = [];
+
+function suggestQuestions(answerText) {
+    let pool = [];
+    const a = answerText.toLowerCase();
+
+    for (let cat in categories) {
+        categories[cat].forEach(item => {
+            const q = item.q.toLowerCase();
+
+            if (
+                (a.includes("ahilik") && q.includes("ahilik")) ||
+                (a.includes("fütüvvet") && q.includes("fütüvvet")) ||
+                (a.includes("kalite") && q.includes("kalite")) ||
+                (a.includes("meslek") && q.includes("meslek")) ||
+                (a.includes("esnaf") && q.includes("esnaf"))
+            ) {
+                pool.push(item.q);
+            }
+        });
+    }
+
+    // Önceki önerileri tekrar verme
+    pool = pool.filter(q => !lastSuggestions.includes(q));
+
+    // Karıştır
+    pool.sort(() => Math.random() - 0.5);
+
+    lastSuggestions = pool.slice(0, 2);
+    return lastSuggestions;
+}
+let suggestionsEnabled = true;
+
+function toggleSuggestions() {
+    suggestionsEnabled = !suggestionsEnabled;
+    const btn = document.getElementById("toggleSuggestBtn");
+    btn.innerText = suggestionsEnabled
+        ? "💡 Soru Önerileri: Açık"
+        : "💤 Soru Önerileri: Kapalı";
+}
+
 </script>
 </body>
 </html>
