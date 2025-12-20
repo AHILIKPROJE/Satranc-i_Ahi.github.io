@@ -484,8 +484,11 @@ if (suggestionsEnabled) {
   // Açılış uyarısını kapatan fonksiyon
 function closeWelcomeModal() {
     document.getElementById('devAlertModal').classList.remove('active');
+
+    welcomeSound.currentTime = 0;
+    welcomeSound.play();
 }
-  
+
 let lastSuggestions = [];
 
 function suggestQuestions(answerText) {
@@ -526,6 +529,9 @@ function toggleSuggestions() {
         ? "💡 Soru Önerileri: Açık"
         : "💤 Soru Önerileri: Kapalı";
 }
+const welcomeSound = new Audio("a.mp3");
+welcomeSound.volume = 0.45;
+welcomeSound.loop = true;
 
 </script>
 </body>
