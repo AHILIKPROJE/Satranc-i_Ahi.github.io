@@ -41,6 +41,59 @@
         .overlay.active { display: flex; }
         .modal-box { background: var(--card-bg); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         .typing { font-size: 11px; color: var(--text-dim); padding: 5px 25px; display: none; }
+   #soundPanel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 12px 14px;
+    width: 160px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    font-size: 12px;
+    z-index: 9999;
+}
+#soundPanel {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+#soundPanel.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sound-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+    color: #e5e7eb;
+}
+
+#muteBtn {
+    width: 100%;
+    padding: 6px;
+    border-radius: 8px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+#muteBtn.muted {
+    background: #334155;
+}
+
+#soundPanel input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+}
+
     </style>
 </head>
 <body>
@@ -128,6 +181,12 @@ Haydi, bilgeliğe giden yola birlikte çıkalım. 🌿</div>
         </button>
     </div>
 </div>
+ <div id="soundPanel">
+    <div class="sound-title">🎵 Ses</div>
+    <button id="muteBtn" onclick="toggleMute()">🔊 Açık</button>
+    <input type="range" min="0" max="100" value="45" oninput="changeVolume(this.value)">
+</div>
+ 
 <script>
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
@@ -487,7 +546,13 @@ function closeWelcomeModal() {
 
     welcomeSound.currentTime = 0;
     welcomeSound.play();
+
+    // Ses panelini göster
+    setTimeout(() => {
+        document.getElementById("soundPanel").classList.add("show");
+    }, 300);
 }
+
 
 let lastSuggestions = [];
 
@@ -532,6 +597,22 @@ function toggleSuggestions() {
 const welcomeSound = new Audio("a.mp3");
 welcomeSound.volume = 0.45;
 welcomeSound.loop = true;
+
+let isMuted = false;
+
+function toggleMute() {
+    isMuted = !isMuted;
+    welcomeSound.muted = isMuted;
+
+    const btn = document.getElementById("muteBtn");
+    btn.innerText = isMuted ? "🔇 Kapalı" : "🔊 Açık";
+    btn.classList.toggle("muted", isMuted);
+}
+
+function changeVolume(val) {
+    welcomeSound.volume = val / 100;
+}
+
 
 </script>
 </body>
