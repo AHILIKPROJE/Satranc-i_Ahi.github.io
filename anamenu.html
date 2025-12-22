@@ -422,16 +422,22 @@ function hitboxlariYukle(){
   aktif.forEach(h=>{
     const div = document.createElement('div');
     div.className = h.isim+"_hitbox";
-    Object.assign(div.style,{
-      left: h.x+"px",
-      top: h.y+"px",
-      width: h.width+"px",
-      height: h.height+"px",
-      background: "transparent",
-      position: "absolute",
-      cursor: "pointer",
-      zIndex: 10
-    });
+
+
+const { scale, offsetX, offsetY } = getTransform();
+
+Object.assign(div.style,{
+  left: (h.x * scale + offsetX) + "px",
+  top: (h.y * scale + offsetY) + "px",
+  width: (h.width * scale) + "px",
+  height: (h.height * scale) + "px",
+  background: "transparent",
+  position: "absolute",
+  cursor: "pointer",
+  zIndex: 10
+});
+
+
 
     if(h.unlemGorsel){
       const img = document.createElement("img"); img.src="unlem.png"; img.className="unlem-img"; div.appendChild(img);
@@ -618,8 +624,31 @@ deleteBtn.addEventListener('click',()=>{
 
 closeBtn.addEventListener('click',()=>{ savePopupElem.style.display="none"; });
 
-// İlk yükleme
-hitboxlariYukle();
+
+                        
+// ================= HITBOX TRANSFORM SİSTEMİ =================
+const BASE_WIDTH = 1920;
+const BASE_HEIGHT = 1080;
+
+function getTransform() {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  const scale = Math.max(vw / BASE_WIDTH, vh / BASE_HEIGHT);
+
+  const offsetX = (vw - BASE_WIDTH * scale) / 2;
+  const offsetY = (vh - BASE_HEIGHT * scale) / 2;
+
+  return { scale, offsetX, offsetY };
+}
+
+    window.addEventListener("resize", () => {
+  hitboxlariYukle();
+});
+  window.addEventListener("load", () => {
+  hitboxlariYukle();
+});
+                
 </script>
 </body>
 </html>
