@@ -130,28 +130,31 @@ function createHowToPlayPanel() {
     overlay.style.animation = "fadeIn 0.5s ease";
 
     overlay.innerHTML = `
-        <div id="howToPlayPanel">
-            <h1>🎮 Oyun Bilgilendirme ✨</h1>
+     <div id="howToPlayPanel">
+  <h1>👜 Kese Oyunu | Nasıl Oynanır ✨</h1>
 
-            <p>
-               Bu oyun, Ahilik kültürüne ait özlü sözleri 📜 öğretici ve eğlenceli bir şekilde sunmak için hazırlanmıştır.
-Oyuncu, verilen sözlerdeki eksik kelimeyi 🧩 doğru seçenekler arasından tamamlar.
-            </p>
+  <p>
+    Bu oyun, <b>Ahilik kültüründe dürüst ticaret ve ölçü bilincini</b> 🎯
+    öğretmek amacıyla hazırlanmıştır. Oyuncu, müşterinin istediği ürünü
+    doğru miktarda keseye koyarak hizmet verir.
+  </p>
 
-            <ul>
-               Oyunda günlük en fazla 5 soru ⏳ çözülebilir.
-Her doğru cevap 20 puan ⭐ kazandırır.
-Yanlış cevaplarda tekrar deneme yapılabilir 🔁
+  <ul>
+    <li>🧾 Müşterinin istediği <b>ürün ve gramajı</b> dikkatlice oku.</li>
+    <li>🖐️ Ürünleri <b>sürükleyerek</b> kesenin içine bırak.</li>
+    <li>⚖️ Fazla ya da eksik koyduysan, <b>geri alma</b> özelliğini kullan.</li> 
+    <li> Fazla koyduysan eğer <b>50 gr tolerans</b> var. </li>
+    <li>📏 Amaç: İstenen miktara <b>en yakın değeri</b> yakalamak.</li>
+  </ul>
 
-            </ul>
+  <p>
+    Servis sonrası verilen miktara göre <b>Saygı Puanı</b> ⭐ kazanır ya da
+    kaybedersin. Ahilikte olduğu gibi, <b>ölçü ve adalet</b> her şeyden önce gelir.
+  </p>
 
-            <p>
-                Sorular, Ahilik geleneği ve Ahi Evran 🏛️ kaynaklıdır.
-Oyun, bilgi ve dikkat 🎯 temelli bir eğitim oyunudur
-            </p>
+  <button id="startGameBtn">OYUNA BAŞLA</button>
+</div>
 
-            <button id="startGameBtn">OYUNA BAŞLA</button>
-        </div>
     `;
 
     document.body.appendChild(overlay);
