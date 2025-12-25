@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -1319,7 +1320,19 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
         Stratejik düşünmek ve dikkatli hamleler yapmak başarının anahtarıdır.
       </p>
     </div>
+    
+    <div class="infoSection">
+      <h3>🎲️Oynanış Sistemi</h3>
+      <p>
+  Satrancı Ahi'de  oyuncu zar atarak oyun tahtasında ilerler. Her 5 karede oyuncuya öğretici bir soru yöneltilir. Oyundaki ilerleme tamamen verilen cevaplara bağlıdır.
 
+✅️ Doğru cevap verildiğinde, oyuncu bulunduğu kareden ileri doğru hareket eder ve oyunda avantaj kazanır.
+❌️ Yanlış cevap verildiğinde, oyuncu geri gider ve ayrıca cevaplama süresinden 10 saniye eksiltilir. Bu durum, bilginin ve dikkatin önemini vurgular.
+
+Oyunun temel amacı, soruları doğru cevaplayarak ilerlemek ve son nokta olan Visâl karesine ulaşmaktır. Satrancı Ahi, rekabetten çok öğrenme, farkındalık ve bilgiyle ilerleme anlayışını esas alır.
+      </p>
+    </div>
+    
     <div class="infoSection">
       <h3>⏳ Zaman Mekaniği</h3>
       <p>
@@ -1328,7 +1341,15 @@ button{padding:8px 12px;border-radius:8px;border:none;background:#00d09c;color:#
         Hızlı ama dikkatli olmak oyunun temposunu belirler.
       </p>
     </div>
-
+    
+   <div class="infoSection">
+      <h3>❤️Tez Vakit</h3>
+      <p>
+     Ahilikte acele etmek doğru görülmez.
+Bu nedenle ekrana art arda ve fazla tıklandığında oyun kısa süreliğine durdurulur. Bu bekleme süresi, sabır ve ölçülü davranmanın önemini hatırlatır.
+      </p>
+    </div>
+    
     <div class="infoSection">
       <h3>🎁 Ödüller & Süper Güçler</h3>
       <p>
@@ -2024,150 +2045,191 @@ function createPauseButton() {
     };
 }
 
-// --- PROFESYONEL PAUSE EKRANI ---
+// ===============================
+// PROFESYONEL PAUSE EKRANI
+// ===============================
 function createPauseScreen() {
     if (document.getElementById("pauseScreen")) return;
 
     const div = document.createElement("div");
     div.id = "pauseScreen";
 
-    div.style.position = "fixed";
-    div.style.top = "0";
-    div.style.left = "0";
-    div.style.width = "100%";
-    div.style.height = "100%";
-    div.style.background = "rgba(0,0,0,0.65)";
-    div.style.display = "none";
-    div.style.justifyContent = "center";
-    div.style.alignItems = "center";
-    div.style.zIndex = "999999998";
-    div.style.backdropFilter = "blur(8px)";
+    Object.assign(div.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        width: "100%",
+        height: "100%",
+        background: "rgba(0,0,0,0.65)",
+        display: "none",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: "999999998",
+        backdropFilter: "blur(8px)"
+    });
 
     div.innerHTML = `
         <div style="
             background: rgba(255,255,255,0.12);
-            padding: 35px;
-            border-radius: 20px;
-            text-align: center;
-            color: white;
-            min-width: 260px;
-            border: 1px solid rgba(255,255,255,0.25);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            padding:35px;
+            border-radius:20px;
+            text-align:center;
+            color:white;
+            min-width:270px;
+            border:1px solid rgba(255,255,255,0.25);
+            backdrop-filter:blur(12px);
+            box-shadow:0 10px 30px rgba(0,0,0,0.4);
         ">
-            <h2 style="margin-top:0;margin-bottom:25px;font-size:26px;">Oyun Duraklatıldı</h2>
+            <h2 style="margin:0 0 25px;font-size:26px;">Oyun Duraklatıldı</h2>
 
-            <button id="resumeBtn" class="pauseBtn">Devam Et</button><br>
-            <button id="restartBtn" class="pauseBtn">Yeniden Başlat</button><br>
-            <button id="menuBtn" class="pauseBtn">Ana Menü</button><br>
-            <button id="settingsBtn" class="pauseBtn">Ayarlar</button><br>
+            <button id="resumeBtn" class="pauseBtn">Devam Et</button>
+            <button id="restartBtn" class="pauseBtn">Yeniden Başlat</button>
+            <button id="menuBtn" class="pauseBtn">Ana Menü</button>
+            <button id="settingsBtn" class="pauseBtn">Ayarlar</button>
             <button id="purchasedBtn" class="pauseBtn">Satın Aldıklarım</button>
         </div>
     `;
-
     document.body.appendChild(div);
 
-    // Butonlar için ortak CSS
-    const style = document.createElement("style");
-    style.innerHTML = `
-        .pauseBtn {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background: rgba(0,0,0,0.55);
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            color: white;
-            cursor: pointer;
-            backdrop-filter: blur(4px);
-            transition: 0.2s;
-            box-shadow: 0 0 10px rgba(0,0,0,0.4);
-        }
-        .pauseBtn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-    `;
-    document.head.appendChild(style);
+    if (!document.getElementById("pauseStyle")) {
+        const style = document.createElement("style");
+        style.id = "pauseStyle";
+        style.innerHTML = `
+            .pauseBtn{
+                width:100%; padding:12px; margin:8px 0;
+                background:rgba(0,0,0,0.55);
+                border:none; border-radius:12px;
+                font-size:17px; color:white;
+                cursor:pointer; transition:0.2s;
+            }
+            .pauseBtn:hover{background:rgba(255,255,255,0.25);}
+            @keyframes fadeScale{
+                from{opacity:0;transform:scale(0.9)}
+                to{opacity:1;transform:scale(1)}
+            }
+        `;
+        document.head.appendChild(style);
+    }
 
-    // --- BUTON FONKSİYONLARI ---
-    document.getElementById("resumeBtn").onclick = () => {
-        div.style.display = "none";
-    };
+    resumeBtn.onclick = () => div.style.display = "none";
+    restartBtn.onclick = () => location.reload();
+    menuBtn.onclick = () => window.location.href = "anamenu.html";
 
-    document.getElementById("restartBtn").onclick = () => {
-        location.reload();
-    };
-
-    document.getElementById("menuBtn").onclick = () => {
-        window.location.href = "anamenu.html";
-    };
-
-    document.getElementById("settingsBtn").onclick = () => {
+    settingsBtn.onclick = () => {
         createSettingsPanel();
-        document.getElementById("settingsPanel").style.display = "block";
+        settingsPanel.style.display = "block";
     };
 
-    document.getElementById("purchasedBtn").onclick = () => {
+    purchasedBtn.onclick = () => {
         createPurchasedPanel();
-        document.getElementById("fullPurchasedPanel").style.display = "flex";
+        fullPurchasedPanel.style.display = "flex";
     };
 }
 
-// --- AYARLAR PANELİ ---
+// ===============================
+// AYARLAR PANELİ
+// ===============================
 function createSettingsPanel() {
     if (document.getElementById("settingsPanel")) return;
 
     const panel = document.createElement("div");
     panel.id = "settingsPanel";
 
-    panel.style.position = "fixed";
-    panel.style.top = "50%";
-    panel.style.left = "50%";
-    panel.style.transform = "translate(-50%, -50%)";
-    panel.style.padding = "30px";
-    panel.style.borderRadius = "18px";
-    panel.style.textAlign = "center";
-    panel.style.minWidth = "280px";
-    panel.style.color = "white";
-    panel.style.zIndex = "999999999";
-    panel.style.display = "none";
-
-    panel.style.background = "rgba(255,255,255,0.12)";
-    panel.style.backdropFilter = "blur(10px)";
-    panel.style.boxShadow = "0 8px 25px rgba(0,0,0,0.4)";
-    panel.style.border = "1px solid rgba(255,255,255,0.25)";
+    Object.assign(panel.style, {
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%,-50%)",
+        padding: "30px",
+        borderRadius: "18px",
+        textAlign: "center",
+        minWidth: "280px",
+        color: "white",
+        display: "none",
+        zIndex: "999999999",
+        background: "rgba(255,255,255,0.12)",
+        backdropFilter: "blur(10px)",
+        boxShadow: "0 8px 25px rgba(0,0,0,0.4)",
+        border: "1px solid rgba(255,255,255,0.25)",
+        animation: "fadeScale 0.25s ease"
+    });
 
     panel.innerHTML = `
-        <h2 style="margin-top:0;margin-bottom:20px;font-size:24px;">Ayarlar</h2>
-        <div style="margin-bottom:20px; font-size:18px;">
+        <h2 style="margin:0 0 20px;">Ayarlar</h2>
+
+        <div style="margin-bottom:20px;font-size:18px;">
             Ses:
             <input id="volumeSlider" type="range" min="0" max="1" step="0.05" value="1" style="width:100%;">
         </div>
+
+        <button id="sourcesBtn" class="pauseBtn">Kaynakçalar</button>
+
         <button id="closeSettings" style="
-            width:100%;
-            padding:12px;
-            background:#e74c3c;
-            border:none;
-            border-radius:12px;
-            color:white;
-            font-size:16px;
-            cursor:pointer;
+            width:100%; padding:12px;
+            background:#e74c3c; border:none;
+            border-radius:12px; color:white;
+            font-size:16px; cursor:pointer; margin-top:10px;
         ">Kapat</button>
     `;
-
     document.body.appendChild(panel);
 
-    document.getElementById("closeSettings").onclick = () => {
-        panel.style.display = "none";
+    closeSettings.onclick = () => panel.style.display = "none";
+
+    sourcesBtn.onclick = () => {
+        createSourcesPanel();
+        sourcesPanel.style.display = "flex";
     };
 
-    const slider = document.getElementById("volumeSlider");
-    slider.oninput = () => {
-        if (typeof music !== "undefined") {
-            music.volume = slider.value;
-        }
+    volumeSlider.oninput = () => {
+        if (typeof music !== "undefined") music.volume = volumeSlider.value;
     };
+}
+
+// ===============================
+// KAYNAKÇALAR PANELİ
+// ===============================
+function createSourcesPanel() {
+    if (document.getElementById("sourcesPanel")) return;
+
+    const panel = document.createElement("div");
+    panel.id = "sourcesPanel";
+
+    Object.assign(panel.style,{
+        position:"fixed", top:0, left:0,
+        width:"100%", height:"100%",
+        background:"rgba(0,0,0,0.65)",
+        display:"none",
+        justifyContent:"center",
+        alignItems:"center",
+        zIndex:"999999999",
+        backdropFilter:"blur(8px)"
+    });
+
+    panel.innerHTML = `
+        <div style="
+            background:rgba(255,255,255,0.12);
+            padding:30px; border-radius:20px;
+            max-width:520px; max-height:80%;
+            overflow-y:auto; color:white;
+            border:1px solid rgba(255,255,255,0.25);
+            animation:fadeScale 0.3s ease;
+        ">
+            <h2 style="text-align:center;margin-top:0;">Kaynakçalar</h2>
+            <div style="font-size:15px;line-height:1.6;">
+                • <b>Ahi Evran-ı Veli</b>, Ahilik Teşkilatı ve Ahlâk Anlayışı<br><br>
+                • <b>Neşet Çağatay</b>, Bir Türk Kurumu Olarak Ahilik<br><br>
+                • <b>İsmail Hakkı Uzunçarşılı</b>, Osmanlı Devleti Teşkilâtına Medhal<br><br>
+                • <b>Mikail Bayram</b>, Ahi Evran ve Ahilik Teşkilatı<br><br>
+                • <b>İbn Battûta</b>, Seyahatnâme (Anadolu)<br><br>
+                • <b>TDV İslâm Ansiklopedisi</b><br><br>
+                • <b>T.C. Kültür ve Turizm Bakanlığı</b><br><br>
+                • <b>UNESCO</b>, Intangible Cultural Heritage: Akhism
+            </div>
+            <button id="closeSources" class="pauseBtn" style="margin-top:20px;">Kapat</button>
+        </div>
+    `;
+    document.body.appendChild(panel);
+    closeSources.onclick = () => panel.style.display = "none";
 }
 
 // --- TAM EKRAN PROFESYONEL SATIN ALDIKLARIM PANELİ ---
@@ -2482,7 +2544,7 @@ function startMotivationSounds() {
     }, 1000);
 }
 
-// --- JS'nin en altına BUNU KOY ---
+// --- Motivasyon sözleri ---
 window.onload = () => {
     startMotivationSounds();
 };
