@@ -20,7 +20,7 @@ body {
 #game {
   width:650px;
   background:rgba(255,248,232,0.95);
-  border:4px solid #b07f3e;
+  border:4px solid #b57b1f;
   border-radius:12px;
   padding:20px;
   text-align:center;
@@ -33,16 +33,16 @@ body {
   left: 50%;
   transform: translateX(-50%);
   background: rgba(240, 230, 200, 0.95);
-  color: #5c3a1a;
+  color: #b57b1f;
   padding: 10px 20px;
-  border: 2px solid #b07f3e;
+  border: 2px solid #b57b1f;
   border-radius: 8px;
   font-size: 14px;
   z-index: 1000;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
-h1 { color:#5c3a1a; }
+h1 { color:#b57b1f; }
 
 button {
   margin:10px;
@@ -96,9 +96,153 @@ button:hover { background:#c18448; }
   </div>
   <div id="score">Puan: 0</div>
 </div>
+<script>
+/* ========== NASIL OYNANIR PANELİ ========== */
+
+function createHowToPlayPanel() {
+    if (document.getElementById("howToPlayOverlay")) return;
+
+    // Oyun durdur
+    isPaused = true;
+
+    const overlay = document.createElement("div");
+    overlay.id = "howToPlayOverlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.background = "rgba(0,0,0,0.75)";
+    overlay.style.backdropFilter = "blur(10px)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "9999999";
+    overlay.style.animation = "fadeIn 0.5s ease";
+
+    overlay.innerHTML = `
+        <div id="howToPlayPanel">
+            <h1>🎮 Oyun Bilgilendirme ✨</h1>
+
+            <p>
+               Bu oyun, Ahilik kültürüne ait özlü sözleri 📜 öğretici ve eğlenceli bir şekilde sunmak için hazırlanmıştır.
+Oyuncu, verilen sözlerdeki eksik kelimeyi 🧩 doğru seçenekler arasından tamamlar.
+            </p>
+
+            <ul>
+               Oyunda günlük en fazla 5 soru ⏳ çözülebilir.
+Her doğru cevap 20 puan ⭐ kazandırır.
+Yanlış cevaplarda tekrar deneme yapılabilir 🔁
+
+            </ul>
+
+            <p>
+                Sorular, Ahilik geleneği ve Ahi Evran 🏛️ kaynaklıdır.
+Oyun, bilgi ve dikkat 🎯 temelli bir eğitim oyunudur
+            </p>
+
+            <button id="startGameBtn">OYUNA BAŞLA</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // CSS (tek sefer eklenir)
+    if (!document.getElementById("howToPlayStyle")) {
+        const style = document.createElement("style");
+        style.id = "howToPlayStyle";
+        style.innerHTML = `
+            #howToPlayPanel {
+                background: linear-gradient(145deg, #0d1a26, #ad9a4c);
+                border: 2px solid #b07f3e;
+                border-radius: 20px;
+                padding: 40px;
+                width: 520px;
+                max-width: 90%;
+                color: #c9c9c7;
+                font-family: 'Orbitron', sans-serif;
+                text-align: center;
+                box-shadow: 0 0 40px rgba(255,215,0,0.6);
+                transform: scale(0.85);
+                animation: panelIn 0.5s ease forwards;
+            }
+
+            #howToPlayPanel h1 {
+                color: #FFD700;
+                margin-bottom: 20px;
+                text-shadow: 0 0 10px rgba(255,215,0,0.6);
+            }
+
+            #howToPlayPanel p {
+                font-size: 15px;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }
+
+            #howToPlayPanel ul {
+                text-align: left;
+                margin: 20px 0;
+                padding-left: 20px;
+            }
+
+            #howToPlayPanel li {
+                margin-bottom: 10px;
+                font-size: 14px;
+            }
+
+            #howToPlayPanel span {
+                color: #917f59;
+                font-weight: bold;
+            }
+
+            #startGameBtn {
+                margin-top: 20px;
+                padding: 14px 35px;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+                border-radius: 12px;
+                background:#917f59;
+                color: #d4cba5;
+                cursor: pointer;
+                box-shadow: 0 0 20px rgba(255,215,0,0.6);
+                transition: 0.2s;
+            }
+
+            #startGameBtn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(255,215,0,0.6);
+            }
+
+            @keyframes panelIn {
+                to { transform: scale(1); }
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.getElementById("startGameBtn").onclick = () => {
+        overlay.style.animation = "fadeIn 0.3s reverse";
+        setTimeout(() => {
+            overlay.remove();
+            isPaused = false;
+        }, 250);
+    };
+}
+
+// Oyun yüklendiğinde otomatik aç
+window.addEventListener("load", () => {
+    setTimeout(createHowToPlayPanel, 500);
+});
+</script>
 
 <script>
-// Havuzumuz artık Ahilik sözleri ve verdiğin eklerle birlikte
+
 const gameData = [
   {quote:"Akıl ve … ile çalış ki kimseye muhtaç olmayasın.", options:["zihin","emek","düşünce"], answer:"emek", source:"Ahi Evran"},
   {quote:"Komşusu açken … uyumayan kişi Ahi değildir.", options:["el","kulak","göz"], answer:"göz", source:"Ahilik geleneği"},
