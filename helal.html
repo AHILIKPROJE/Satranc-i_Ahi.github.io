@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -81,6 +82,153 @@ button:hover { background:#c18448; }
   <div id="feedback"></div>
   <div id="score">Ahlak Puanı: 0</div>
 </div>
+<script>
+/* ========== NASIL OYNANIR PANELİ ========== */
+
+function createHowToPlayPanel() {
+    if (document.getElementById("howToPlayOverlay")) return;
+
+    // Oyun durdur
+    isPaused = true;
+
+    const overlay = document.createElement("div");
+    overlay.id = "howToPlayOverlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.background = "rgba(0,0,0,0.75)";
+    overlay.style.backdropFilter = "blur(10px)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "9999999";
+    overlay.style.animation = "fadeIn 0.5s ease";
+
+    overlay.innerHTML = `
+      <div id="howToPlayPanel">
+    <h1>🎮 NASIL OYNANIR?</h1>
+
+    <p>
+        Bu oyunda ekrana gelen ürünleri dikkatlice incelemelisin.
+        Amaç, <b>ahlaka ve kurallara uygun ürünleri</b> doğru seçmek,
+        <b>hileli ve bozuk ürünleri</b> ayırt edebilmektir.
+    </p>
+
+    <ul>
+        <li>🟢 <b>Taze ve düzgün ürün</b> → <span>HELAL</span></li>
+        <li>🔴 <b>Çürük veya bozuk ürün</b> → <span>HİLELİ / HARAM</span></li>
+        <li>⭐ Doğru seçim → <b>Ahlak puanı artar</b></li>
+        <li>❌ Yanlış seçim → <b>Hata sayısı artar</b></li>
+        <li>⛔ 3 yanlış → <b>Dükkan kapanır</b></li>
+    </ul>
+
+    <p>
+        Amaç, Ahilik anlayışına uygun şekilde
+        <b>dürüst ticaret ve kaliteyi</b> korumaktır.
+    </p>
+
+    <button id="startGameBtn">OYUNA BAŞLA</button>
+</div>
+
+    `;
+
+    document.body.appendChild(overlay);
+
+    // CSS (tek sefer eklenir)
+    if (!document.getElementById("howToPlayStyle")) {
+        const style = document.createElement("style");
+        style.id = "howToPlayStyle";
+        style.innerHTML = `
+            #howToPlayPanel {
+                background: linear-gradient(145deg, #0d1a26, #ad9a4c);
+                border: 2px solid #b07f3e;
+                border-radius: 20px;
+                padding: 40px;
+                width: 520px;
+                max-width: 90%;
+                color: #c9c9c7;
+                font-family: 'Orbitron', sans-serif;
+                text-align: center;
+                box-shadow: 0 0 40px rgba(255,215,0,0.6);
+                transform: scale(0.85);
+                animation: panelIn 0.5s ease forwards;
+            }
+
+            #howToPlayPanel h1 {
+                color: #FFD700;
+                margin-bottom: 20px;
+                text-shadow: 0 0 10px rgba(255,215,0,0.6);
+            }
+
+            #howToPlayPanel p {
+                font-size: 15px;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }
+
+            #howToPlayPanel ul {
+                text-align: left;
+                margin: 20px 0;
+                padding-left: 20px;
+            }
+
+            #howToPlayPanel li {
+                margin-bottom: 10px;
+                font-size: 14px;
+            }
+
+            #howToPlayPanel span {
+                color: #917f59;
+                font-weight: bold;
+            }
+
+            #startGameBtn {
+                margin-top: 20px;
+                padding: 14px 35px;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+                border-radius: 12px;
+                background:#917f59;
+                color: #d4cba5;
+                cursor: pointer;
+                box-shadow: 0 0 20px rgba(255,215,0,0.6);
+                transition: 0.2s;
+            }
+
+            #startGameBtn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(255,215,0,0.6);
+            }
+
+            @keyframes panelIn {
+                to { transform: scale(1); }
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.getElementById("startGameBtn").onclick = () => {
+        overlay.style.animation = "fadeIn 0.3s reverse";
+        setTimeout(() => {
+            overlay.remove();
+            isPaused = false;
+        }, 250);
+    };
+}
+
+// Oyun yüklendiğinde otomatik aç
+window.addEventListener("load", () => {
+    setTimeout(createHowToPlayPanel, 500);
+});
+</script>
 
 <script>
 // Ürünler: taze=helal, çürük=haram
@@ -139,3 +287,4 @@ loadProduct();
 
 </body>
 </html>
+
