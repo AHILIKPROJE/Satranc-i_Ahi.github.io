@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Proje Teknik Detayları & Pedagojik Altyapı</title>
+    <link rel="icon" type="image/png" href="site.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap');
+
+        body {
+            margin: 0; padding: 0;
+            background-color: #0d1a26;
+            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Başlık Alanı */
+        header {
+            background: linear-gradient(135deg, #00FFC0 0%, #007bff 100%);
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            color: #0d1a26;
+            letter-spacing: 2px;
+            font-size: 2.5em;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* Kategori Kartları */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(26, 42, 58, 0.8);
+            border: 1px solid #00FFC0;
+            border-radius: 12px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 255, 192, 0.2);
+        }
+
+        .card h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #FFD700;
+            font-size: 1.2em;
+            margin-top: 0;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p {
+            font-size: 0.95em;
+            color: #ccc;
+        }
+
+        .badge {
+            background: #00FFC0;
+            color: #0d1a26;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-weight: bold;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        /* Geliştirilebilirlik Çizelgesi */
+        .roadmap {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 40px;
+            border-left: 5px solid #007bff;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-family: 'Orbitron', sans-serif;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover { background: #0056b3; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>PROJE ANALİZ PANELİ</h1>
+    <p>Erdemli Meslekler Galaksisi: Bilimsel ve Pedagojik Yaklaşım</p>
+</header>
+
+<div class="container">
+    <div class="category-grid">
+        
+        <div class="card">
+            <span class="badge">PEDAGOJİ</span>
+            <h2>🎯 Eğitsel Kazanımlar</h2>
+            <p>Oyun, öğrencilerin ölçme–tartma becerilerini, odaklanma sürelerini ve temel ahlaki değerler bilincini geliştirmeyi amaçlayan dijital bir eğitim materyalidir.</p>
+        </div>
+
+        <div class="card">
+            <span class="badge">KÜLTÜR</span>
+            <h2>📜 Değerler Eğitimi</h2>
+            <p>Ahilik kültüründeki dürüstlük, emanet bilinci ve kul hakkı gibi kadim değerler, oyunlaştırma (gamification) teknikleriyle modern bir formata taşınmıştır.</p>
+        </div>
+
+        <div class="card">
+            <span class="badge">ETİK</span>
+            <h2>⏳ Bilinçli Kullanım</h2>
+            <p>Sistemde bulunan günlük etkileşim limiti, dijital bağımlılığı önlemek ve öğrencinin bilgiyi nitelikli şekilde sindirmesini sağlamak amacıyla tasarlanmıştır.</p>
+        </div>
+
+        <div class="card">
+            <span class="badge">TEKNOLOJİ</span>
+            <h2>🎨 Özgün Tasarım</h2>
+            <p>Görsel varlıklar, yapay zekâ destekli araçlar kullanılarak proje ihtiyaçlarına göre özgün biçimde üretilmiş ve optimize edilmiştir.</p>
+        </div>
+
+        <div class="card">
+            <span class="badge">UX</span>
+            <h2>♿ Erişilebilirlik</h2>
+            <p>Sadeleştirilmiş arayüz ve yüksek kontrastlı renk paleti sayesinde, farklı bilişsel seviyelere sahip öğrencilerin platformu rahatça kullanması hedeflenmiştir.</p>
+        </div>
+
+        <div class="card">
+            <span class="badge">HEDEF</span>
+            <h2>👥 Hedef Kitle</h2>
+            <p>Temel seviye ahlaki gelişim ve dikkat eksikliği odaklı rehberlik çalışmalarına uygun olarak ortaokul ve lise düzeyine optimize edilmiştir.</p>
+        </div>
+    </div>
+
+    <div class="roadmap">
+        <h2 style="font-family: 'Orbitron'; color: #00FFC0;">🚀 Gelecek Planlaması</h2>
+        <p>Proje; farklı meslek dalları, gelişmiş veri analizi modülleri ve çoklu dil desteği eklenerek uluslararası ölçekte bir eğitim platformuna dönüştürülmeye açıktır.</p>
+    </div>
+
+    <center>
+        <a href="oyun.html" class="back-btn">← OYUNA GERİ DÖN</a>
+    </center>
+</div>
+
+</body>
+</html>
