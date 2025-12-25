@@ -204,6 +204,152 @@
     </div>
 
     <canvas id="gameCanvas"></canvas>
+<script>
+/* ========== NASIL OYNANIR PANELİ ========== */
+
+function createHowToPlayPanel() {
+    if (document.getElementById("howToPlayOverlay")) return;
+
+    // Oyun durdur
+    isPaused = true;
+
+    const overlay = document.createElement("div");
+    overlay.id = "howToPlayOverlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.background = "rgba(0,0,0,0.75)";
+    overlay.style.backdropFilter = "blur(10px)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "9999999";
+    overlay.style.animation = "fadeIn 0.5s ease";
+
+    overlay.innerHTML = `
+        <div id="howToPlayPanel">
+            <h1>🚀 NASIL OYNANIR?</h1>
+
+            <p>
+                Bu oyunda karşına çıkan kavramları dikkatle incelemelisin.
+                Amaç, <b>kötü ve zararlı kavramları</b> vurarak yok etmek,
+                <b>iyi ve erdemli kavramlardan</b> ise uzak durmaktır.
+            </p>
+
+            <ul>
+                <li>🟢 <b>Kırmızı halkalı kavramlar</b> → <span>VURULMALI</span></li>
+                <li>🔵 <b>Halkasız (iyi) kavramlar</b> → <span>VURULMAMALI</span></li>
+                <li>🎯 Doğru hedefi vur → <b>Skor artar</b></li>
+                <li>❌ Yanlış hedefi vur → <b>Can azalır</b></li>
+                <li>⏳ Kötü kavram kaçarsa → <b>Skor düşer</b></li>
+            </ul>
+
+            <p>
+                Zorluk seviyesi arttıkça hedefler hızlanır ve sayıları artar.
+                Dikkat, refleks ve doğru karar verme bu oyunun anahtarıdır.
+            </p>
+
+            <button id="startGameBtn">OYUNA BAŞLA</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // CSS (tek sefer eklenir)
+    if (!document.getElementById("howToPlayStyle")) {
+        const style = document.createElement("style");
+        style.id = "howToPlayStyle";
+        style.innerHTML = `
+            #howToPlayPanel {
+                background: linear-gradient(145deg, #0d1a26, #08121a);
+                border: 2px solid #00FFC0;
+                border-radius: 20px;
+                padding: 40px;
+                width: 520px;
+                max-width: 90%;
+                color: #e0f7ff;
+                font-family: 'Orbitron', sans-serif;
+                text-align: center;
+                box-shadow: 0 0 40px rgba(0,255,192,0.6);
+                transform: scale(0.85);
+                animation: panelIn 0.5s ease forwards;
+            }
+
+            #howToPlayPanel h1 {
+                color: #FFD700;
+                margin-bottom: 20px;
+                text-shadow: 0 0 10px rgba(255,215,0,0.7);
+            }
+
+            #howToPlayPanel p {
+                font-size: 15px;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }
+
+            #howToPlayPanel ul {
+                text-align: left;
+                margin: 20px 0;
+                padding-left: 20px;
+            }
+
+            #howToPlayPanel li {
+                margin-bottom: 10px;
+                font-size: 14px;
+            }
+
+            #howToPlayPanel span {
+                color: #00FFC0;
+                font-weight: bold;
+            }
+
+            #startGameBtn {
+                margin-top: 20px;
+                padding: 14px 35px;
+                font-size: 16px;
+                font-weight: bold;
+                border: none;
+                border-radius: 12px;
+                background: #00FFC0;
+                color: #0d1a26;
+                cursor: pointer;
+                box-shadow: 0 0 20px rgba(0,255,192,0.8);
+                transition: 0.2s;
+            }
+
+            #startGameBtn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(0,255,192,1);
+            }
+
+            @keyframes panelIn {
+                to { transform: scale(1); }
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.getElementById("startGameBtn").onclick = () => {
+        overlay.style.animation = "fadeIn 0.3s reverse";
+        setTimeout(() => {
+            overlay.remove();
+            isPaused = false;
+        }, 250);
+    };
+}
+
+// Oyun yüklendiğinde otomatik aç
+window.addEventListener("load", () => {
+    setTimeout(createHowToPlayPanel, 500);
+});
+</script>
 
     <script>
         // --- Oyun Durumu ve Kontrol Değişkenleri ---
@@ -687,10 +833,11 @@
                  return;
             }
 
-            if (isPaused || isGameOver) {
-                renderer.render(scene, camera);
-                return; 
-            }
+        if (isPaused || isGameOver) {
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    return;
+}
 
             requestAnimationFrame(animate);
 
