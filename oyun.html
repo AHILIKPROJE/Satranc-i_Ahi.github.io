@@ -2205,36 +2205,42 @@ function createSourcesPanel() {
         backdropFilter:"blur(8px)"
     });
 
-    panel.innerHTML = `
-        <div style="
-            background:rgba(255,255,255,0.12);
-            padding:30px; border-radius:20px;
-            max-width:520px; max-height:80%;
-            overflow-y:auto; color:white;
-            border:1px solid rgba(255,255,255,0.25);
-            animation:fadeScale 0.3s ease;
-        ">
-            <h2 style="text-align:center;margin-top:0;">Kaynakçalar</h2>
-            <div style="font-size:15px;line-height:1.6;">
-                • <b>Ahi Evran-ı Veli</b>, Ahilik Teşkilatı ve Ahlâk Anlayışı<br><br>
-                • <b>Neşet Çağatay</b>, Bir Türk Kurumu Olarak Ahilik<br><br>
-                • <b>İsmail Hakkı Uzunçarşılı</b>, Osmanlı Devleti Teşkilâtına Medhal<br><br>
-                • <b>Mikail Bayram</b>, Ahi Evran ve Ahilik Teşkilatı<br><br>
-                • <b>İbn Battûta</b>, Seyahatnâme (Anadolu)<br><br>
-                • <b>TDV İslâm Ansiklopedisi</b><br><br>
-                • <b>T.C. Kültür ve Turizm Bakanlığı</b><br><br>
-                • <b>UNESCO</b>, Intangible Cultural Heritage: Akhism
-               <h2 style="text-align:center;margin-top:0;">Telifler</h2>                        
-                                                              
-                         • <b>Telif Hakkı İçermeyen Müzik Kullanımı</b><br><br>
-Oyunda kullanılan müzikler, YouTube platformunda yer alan telif hakkı içermeyen
-(No Copyright) müzik kütüphanelerinden seçilmiştir. Kullanılan ses içerikleri,
-eğitim amaçlı bu projede telif haklarına uygun şekilde kullanılmış olup,
-herhangi bir ticari kazanç amacı taşımamaktadır.                                     
-            </div>
-            <button id="closeSources" class="pauseBtn" style="margin-top:20px;">Kapat</button>
+panel.innerHTML = `
+    <div style="
+        background:rgba(255,255,255,0.12);
+        padding:30px; border-radius:20px;
+        max-width:520px; max-height:80%;
+        overflow-y:auto; color:white;
+        border:1px solid rgba(255,255,255,0.25);
+        animation:fadeScale 0.3s ease;
+    ">
+        <h2 style="text-align:center;margin-top:0;">Kaynakçalar</h2>
+        <div style="font-size:15px;line-height:1.6;">
+            • <b>Ahi Evran-ı Veli</b>, Ahilik Teşkilatı ve Ahlâk Anlayışı<br><br>
+            • <b>Neşet Çağatay</b>, Bir Türk Kurumu Olarak Ahilik<br><br>
+            • <b>İsmail Hakkı Uzunçarşılı</b>, Osmanlı Devleti Teşkilâtına Medhal<br><br>
+            • <b>Mikail Bayram</b>, Ahi Evran ve Ahilik Teşkilatı<br><br>
+            • <b>İbn Battûta</b>, Seyahatnâme (Anadolu)<br><br>
+            • <b>TDV İslâm Ansiklopedisi</b><br><br>
+            • <b>T.C. Kültür ve Turizm Bakanlığı</b><br><br>
+            • <b>UNESCO</b>, Intangible Cultural Heritage: Akhism<br><br>
+
+            Daha fazlası için: 
+            <a href="a.html" target="_blank" style="color:#1E90FF; text-decoration:underline; cursor:pointer;">
+                Tıklayın
+            </a>
+
+            <h2 style="text-align:center;margin-top:20px;">Telifler</h2>                        
+            • <b>Telif Hakkı İçermeyen Müzik Kullanımı</b><br><br>
+            Oyunda kullanılan müzikler, YouTube platformunda yer alan telif hakkı içermeyen
+            (No Copyright) müzik kütüphanelerinden seçilmiştir. Kullanılan ses içerikleri,
+            eğitim amaçlı bu projede telif haklarına uygun şekilde kullanılmış olup,
+            herhangi bir ticari kazanç amacı taşımamaktadır.                                     
         </div>
-    `;
+        <button id="closeSources" class="pauseBtn" style="margin-top:20px;">Kapat</button>
+    </div>
+`;
+
     document.body.appendChild(panel);
     closeSources.onclick = () => panel.style.display = "none";
 }
